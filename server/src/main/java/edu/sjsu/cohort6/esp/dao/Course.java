@@ -63,5 +63,11 @@ public class Course implements DataModel{
         return "course";
     }
 
-
+    @Override
+    public String toString() {
+        return "Course{" +
+                "courseName='" + courseName + '\'' +
+                ", studentRefs=" + studentRefs +
+                '}';
+    }
 }

@@ -17,6 +17,14 @@ public class Student implements DataModel {
     private String emailId;
     private List<String> courseRefs = new ArrayList<String>();
 
+    public List<String> getCourseRefs() {
+        return courseRefs;
+    }
+
+    public void setCourseRefs(List<String> courseRefs) {
+        this.courseRefs = courseRefs;
+    }
+
     public Student() {}
 
     public Student(String first, String last, String email) {
@@ -73,5 +81,15 @@ public class Student implements DataModel {
 
     public void setEmailId(String emailId) {
         this.emailId = emailId;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", emailId='" + emailId + '\'' +
+                ", courseRefs=" + courseRefs +
+                '}';
     }
 }
