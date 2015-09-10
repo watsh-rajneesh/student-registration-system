@@ -24,7 +24,10 @@ public class MongoDBClient implements DBClient {
         final Student student = new Student("Watsh", "Rajneesh", "watsh.rajneesh@sjsu.edu", "password");
         datastore.save(student);
 
-        final Course course = new Course.Builder("Cloud Technologies").maxCapacity(20).price(200.0).build();
+        final Course course = new Course.Builder("Cloud Technologies")
+                .maxCapacity(20)
+                .price(200.0)
+                .build();
         datastore.save(course);
 
         student.getCourseRefs().add(course);
