@@ -1,13 +1,14 @@
 package edu.sjsu.cohort6.esp.dao;
 
 
-import edu.sjsu.cohort6.esp.dao.model.Course;
-import edu.sjsu.cohort6.esp.dao.model.Student;
+import edu.sjsu.cohort6.esp.dao.mongodb.Course;
+import edu.sjsu.cohort6.esp.dao.mongodb.Student;
 
 import java.util.List;
 
 /**
- * Created by rwatsh on 9/8/15.
+ * A generic DB Client interface.
+ * @author rwatsh
  */
 public interface DBClient extends AutoCloseable {
     // Common
@@ -18,6 +19,7 @@ public interface DBClient extends AutoCloseable {
     void addStudents(List<Student> studentList);
     long removeStudents(List<String> studentIdsList);
     void updateStudents(List<Student> studentList);
+    void updateStudents(List<Student> studentList, List<Course> courseList);
     List<Student> fetchStudents(List<String> studentIdsList);
 
     // Course

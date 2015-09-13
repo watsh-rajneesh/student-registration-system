@@ -1,17 +1,14 @@
-package edu.sjsu.cohort6.esp.dao.model;
+package edu.sjsu.cohort6.esp.dao.mongodb;
 
+import edu.sjsu.cohort6.esp.dao.mongodb.Course;
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Field;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Index;
-import org.mongodb.morphia.annotations.Indexes;
-import org.mongodb.morphia.annotations.Reference;
+import org.mongodb.morphia.annotations.*;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,10 +23,15 @@ public class Student {
     private ObjectId id;
     private String firstName;
     private String lastName;
+    @Indexed(name="emailId", unique=true,dropDups=true)
     private String emailId;
     private String passwordHash;
     @Reference
     private List<Course> courseRefs;
+
+    Date lastUpdated = new Date();
+
+    @PrePersist void prePersist() {lastUpdated = new Date();}
 
     public Student(String firstName, String lastName, String emailId, String password) {
         this.firstName = firstName;

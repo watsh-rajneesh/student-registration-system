@@ -1,14 +1,8 @@
-package edu.sjsu.cohort6.esp.dao.model;
+package edu.sjsu.cohort6.esp.dao.mongodb;
 
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Field;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Index;
-import org.mongodb.morphia.annotations.Indexes;
-import org.mongodb.morphia.annotations.Reference;
+import org.mongodb.morphia.annotations.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,6 +16,7 @@ import java.util.List;
 public class Course {
     @Id
     private ObjectId id;
+    @Indexed(name="courseName", unique=true,dropDups=true)
     private String courseName;
     private List<String> instructors;
     private Date startTime;
@@ -33,8 +28,12 @@ public class Course {
     private Double price;
     private String location;
     private List<String> keywords;
-    @Reference
-    private List<Student> studentRefs;
+    /*@Reference
+    private List<Student> studentRefs;*/
+
+    Date lastUpdated = new Date();
+
+    @PrePersist void prePersist() {lastUpdated = new Date();}
 
     public Course() {}
 
@@ -50,11 +49,11 @@ public class Course {
         private Double price = 0.0;
         private String location;
         private List<String> keywords;
-        private List<Student> studentRefs;
+        //private List<Student> studentRefs;
 
         public Builder(String courseName) {
             this.courseName = courseName;
-            this.studentRefs = new ArrayList<>();
+            //this.studentRefs = new ArrayList<>();
         }
 
         public Builder instructors(List<String> instructors) {
@@ -124,7 +123,7 @@ public class Course {
         this.price = b.price;
         this.startDate = b.startDate;
         this.startTime = b.startTime;
-        this.studentRefs = b.studentRefs;
+        //this.studentRefs = b.studentRefs;
     }
 
     public ObjectId getId() {
@@ -223,13 +222,13 @@ public class Course {
         this.keywords = keywords;
     }
 
-    public List<Student> getStudentRefs() {
+    /*public List<Student> getStudentRefs() {
         return studentRefs;
     }
 
     public void setStudentRefs(List<Student> studentRefs) {
         this.studentRefs = studentRefs;
-    }
+    }*/
 
     @Override
     public String toString() {
@@ -246,7 +245,7 @@ public class Course {
                 ", price=" + price +
                 ", location='" + location + '\'' +
                 ", keywords=" + keywords +
-                ", studentRefs=" + studentRefs +
+                //", studentRefs=" + studentRefs +
                 '}';
     }
 }

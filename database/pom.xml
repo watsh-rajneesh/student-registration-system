@@ -5,11 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>edu.sjsu.cohort6.esp</groupId>
-    <artifactId>studentregserver</artifactId>
+    <artifactId>database</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <properties>
         <mongodb.version>3.0.2</mongodb.version>
+        <morphia.version>1.0.1</morphia.version>
+        <dropwizard.version>0.8.2</dropwizard.version>
     </properties>
 
     <dependencies>
@@ -19,19 +21,29 @@
             <version>${mongodb.version}</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.1.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mongodb.morphia</groupId>
             <artifactId>morphia</artifactId>
-            <version>1.0.1</version>
+            <version>${morphia.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-core</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>4.0</version>
         </dependency>
     </dependencies>
     <build>
-        <finalName>studentregserver</finalName>
+        <finalName>database</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
