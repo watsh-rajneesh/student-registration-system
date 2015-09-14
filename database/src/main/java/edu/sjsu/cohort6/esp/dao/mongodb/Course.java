@@ -1,4 +1,4 @@
-package edu.sjsu.cohort6.esp.dao.test.mongodb;
+package edu.sjsu.cohort6.esp.dao.mongodb;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
@@ -11,7 +11,7 @@ import java.util.List;
  *  db.course.find().pretty()
  {
      "_id" : ObjectId("55f6f4c0d3fde80d8c2592e0"),
-     "className" : "edu.sjsu.cohort6.esp.dao.test.mongodb.Course",
+     "className" : "Course",
      "courseName" : "Cloud Technologies",
      "instructors" : [
          "Ahmad Nouri",

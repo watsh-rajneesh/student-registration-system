@@ -1,4 +1,4 @@
-package edu.sjsu.cohort6.esp.dao.test.mongodb;
+package edu.sjsu.cohort6.esp.dao.mongodb;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;

@@ -3,8 +3,11 @@ package edu.sjsu.cohort6.esp.dao.test;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Module;
-import edu.sjsu.cohort6.esp.dao.test.mongodb.Course;
-import edu.sjsu.cohort6.esp.dao.test.mongodb.Student;
+import edu.sjsu.cohort6.esp.dao.DBClient;
+import edu.sjsu.cohort6.esp.dao.DBFactory;
+import edu.sjsu.cohort6.esp.dao.DatabaseModule;
+import edu.sjsu.cohort6.esp.dao.mongodb.Course;
+import edu.sjsu.cohort6.esp.dao.mongodb.Student;
 import org.testng.Assert;
 import org.testng.annotations.*;
 

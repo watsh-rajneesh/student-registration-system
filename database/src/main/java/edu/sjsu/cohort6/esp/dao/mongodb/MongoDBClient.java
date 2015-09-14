@@ -1,9 +1,9 @@
-package edu.sjsu.cohort6.esp.dao.test.mongodb;
+package edu.sjsu.cohort6.esp.dao.mongodb;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.mongodb.MongoClient;
-import edu.sjsu.cohort6.esp.dao.test.DBClient;
+import edu.sjsu.cohort6.esp.dao.DBClient;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;

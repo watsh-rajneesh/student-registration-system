@@ -1,8 +1,8 @@
-package edu.sjsu.cohort6.esp.dao.test;
+package edu.sjsu.cohort6.esp.dao;
 
 
-import edu.sjsu.cohort6.esp.dao.test.mongodb.Course;
-import edu.sjsu.cohort6.esp.dao.test.mongodb.Student;
+import edu.sjsu.cohort6.esp.dao.mongodb.Course;
+import edu.sjsu.cohort6.esp.dao.mongodb.Student;
 
 import java.util.List;
 
