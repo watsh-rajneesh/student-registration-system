@@ -20,8 +20,9 @@ public class MockDBClient implements DBClient {
     }
 
     @Override
-    public void addStudents(List<Student> studentList) {
+    public List<String> addStudents(List<Student> studentList) {
 
+        return null;
     }
 
     @Override

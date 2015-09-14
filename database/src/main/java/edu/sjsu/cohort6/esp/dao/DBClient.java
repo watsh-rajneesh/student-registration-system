@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * A generic DB Client interface.
+ *
  * @author rwatsh
  */
 public interface DBClient extends AutoCloseable {
@@ -16,7 +17,7 @@ public interface DBClient extends AutoCloseable {
     void useDB(String dbName);
 
     // Student
-    void addStudents(List<Student> studentList);
+    List<String> addStudents(List<Student> studentList);
     long removeStudents(List<String> studentIdsList);
     void updateStudents(List<Student> studentList);
     void updateStudents(List<Student> studentList, List<Course> courseList);
