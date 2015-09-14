@@ -172,16 +172,33 @@ public class DBClientTest {
 
     @Test
     public void testRemoveCourses() throws Exception {
-
+        List<String> insertedIds = testCreateCourse();
+        Assert.assertNotNull(insertedIds);
+        long countRemovedEntries = client.removeCourses(insertedIds);
+        Assert.assertTrue(countRemovedEntries > 0, "Failed to delete any course");
     }
 
     @Test
     public void testUpdateCourses() throws Exception {
-
+        List<String> insertedIds = testCreateCourse();
+        Assert.assertNotNull(insertedIds);
+        List<Course> courses = client.fetchCourses(insertedIds);
+        Assert.assertNotNull(courses);
+        for (Course c : courses) {
+            c.setAvailabilityStatus(Course.AvailabilityStatus.UNAVAILABLE.getValue());
+        }
+        log.info("Course modified: " + courses);
+        client.updateCourses(courses);
+        courses = client.fetchCourses(insertedIds);
+        Assert.assertNotNull(courses);
+        log.info("Course updated in DB: " + courses);
     }
 
     @Test
     public void testFetchCourses() throws Exception {
-
+        List<String> insertedIds = testCreateCourse();
+        Assert.assertNotNull(insertedIds);
+        List<Course> courses = client.fetchCourses(insertedIds);
+        Assert.assertNotNull(courses);
     }
 }
