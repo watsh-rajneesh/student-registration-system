@@ -67,7 +67,7 @@ public class MongoDBClient implements DBClient {
      * @param dbName    name of db to use
      */
     @Inject
-    private MongoDBClient(@Assisted("server") String server, @Assisted("port") int port, @Assisted String dbName) {
+    private MongoDBClient(@Assisted("server") String server, @Assisted("port") int port, @Assisted("dbName") String dbName) {
         this.server = server;
         this.port = port;
         this.dbName = dbName;
