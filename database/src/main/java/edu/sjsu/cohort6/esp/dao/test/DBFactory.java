@@ -1,4 +1,4 @@
-package edu.sjsu.cohort6.esp.dao;
+package edu.sjsu.cohort6.esp.dao.test;
 
 import com.google.inject.assistedinject.Assisted;
 

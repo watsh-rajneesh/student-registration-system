@@ -1,4 +1,4 @@
-package edu.sjsu.cohort6.esp.dao.mongodb;
+package edu.sjsu.cohort6.esp.dao.test.mongodb;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
@@ -7,7 +7,34 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by rwatsh on 9/7/15.
+ * Course entity.
+ *  db.course.find().pretty()
+ {
+     "_id" : ObjectId("55f6f4c0d3fde80d8c2592e0"),
+     "className" : "edu.sjsu.cohort6.esp.dao.test.mongodb.Course",
+     "courseName" : "Cloud Technologies",
+     "instructors" : [
+         "Ahmad Nouri",
+         "Thomas Hildebrand",
+         "Aktouf"
+     ],
+     "startTime" : ISODate("1970-01-01T18:30:00Z"),
+     "endTime" : ISODate("1970-01-01T21:00:00Z"),
+     "startDate" : ISODate("2015-10-10T07:00:00Z"),
+     "endDate" : ISODate("2015-11-10T08:00:00Z"),
+     "availabilityStatus" : 1,
+     "maxCapacity" : 20,
+     "price" : 200,
+     "location" : "Santa Clara, CA",
+     "keywords" : [
+         "Java",
+         "MongoDB",
+         "REST"
+     ],
+     "lastUpdated" : ISODate("2015-09-14T16:24:32.877Z")
+ }
+ *
+ * @author rwatsh
  */
 @Entity("course")
 @Indexes(
@@ -28,6 +55,7 @@ public class Course {
     private Double price;
     private String location;
     private List<String> keywords;
+
     /*@Reference
     private List<Student> studentRefs;*/
 
@@ -247,5 +275,18 @@ public class Course {
                 ", keywords=" + keywords +
                 //", studentRefs=" + studentRefs +
                 '}';
+    }
+
+    public static enum AvailabilityStatus {
+        AVAILABLE(1), UNAVAILABLE(0);
+        private int value;
+
+        private AvailabilityStatus(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
     }
 }

@@ -1,4 +1,4 @@
-package edu.sjsu.cohort6.esp.dao.mongodb;
+package edu.sjsu.cohort6.esp.dao.test.mongodb;
 
 import com.mongodb.MongoClient;
 import org.mongodb.morphia.Morphia;

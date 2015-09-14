@@ -1,8 +1,14 @@
-package edu.sjsu.cohort6.esp.dao.mongodb;
+package edu.sjsu.cohort6.esp.dao.test.mongodb;
 
-import edu.sjsu.cohort6.esp.dao.mongodb.Course;
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.*;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Field;
+import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Index;
+import org.mongodb.morphia.annotations.Indexed;
+import org.mongodb.morphia.annotations.Indexes;
+import org.mongodb.morphia.annotations.PrePersist;
+import org.mongodb.morphia.annotations.Reference;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -12,7 +18,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by rwatsh on 9/7/15.
+ * Student entity.
+ *
+ * @author rwatsh
  */
 @Entity("student")
 @Indexes(

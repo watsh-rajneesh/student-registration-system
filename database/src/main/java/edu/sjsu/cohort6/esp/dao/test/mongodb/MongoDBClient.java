@@ -1,9 +1,9 @@
-package edu.sjsu.cohort6.esp.dao.mongodb;
+package edu.sjsu.cohort6.esp.dao.test.mongodb;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.mongodb.MongoClient;
-import edu.sjsu.cohort6.esp.dao.DBClient;
+import edu.sjsu.cohort6.esp.dao.test.DBClient;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
@@ -17,6 +17,8 @@ import java.util.List;
 
 /**
  * A concrete DB Client implementation for MongoDB.
+ *
+ * This DB client implementation will use the DAO instances to operate on the DB.
  *
  * @author rwatsh
  */
@@ -55,6 +57,15 @@ public class MongoDBClient implements DBClient {
 
     }
 
+    /**
+     * Constructs a MongoDB client instance.
+     *
+     * This is private so it can only be instantiated via DI (using Guice).
+     *
+     * @param server    server hostname or ip
+     * @param port      port number for mongodb service
+     * @param dbName    name of db to use
+     */
     @Inject
     private MongoDBClient(@Assisted("server") String server, @Assisted("port") int port, @Assisted String dbName) {
         this.server = server;
@@ -162,11 +173,13 @@ public class MongoDBClient implements DBClient {
     }
 
     @Override
-    public void addCourse(List<Course> courseList) {
+    public List<String> addCourse(List<Course> courseList) {
         //morphiaDatastore.save(courseList);
+        List<String> insertedIds = new ArrayList<>();
         for (Course course: courseList) {
-            courseDAO.save(course);
+            insertedIds.add(((ObjectId) courseDAO.save(course).getId()).toString());
         }
+        return insertedIds;
     }
 
     @Override
@@ -182,21 +195,21 @@ public class MongoDBClient implements DBClient {
 
     @Override
     public void updateCourses(List<Course> courseList) {
-        for (Course s : courseList) {
+        for (Course course : courseList) {
             UpdateOperations<Course> ops = courseDAO.createUpdateOperations()
-                    .set("courseName", s.getCourseName())
-                    .set("availabilityStatus", s.getAvailabilityStatus())
-                    .set("endDate", s.getEndDate())
-                    .set("endTime", s.getEndTime())
-                    .set("instructors", s.getInstructors())
-                    .set("keywords", s.getKeywords())
-                    .set("location", s.getLocation())
-                    .set("maxCapacity", s.getMaxCapacity())
-                    .set("price", s.getPrice())
-                    .set("startDate", s.getStartDate())
-                    .set("startTime", s.getStartTime());
+                    .set("courseName", course.getCourseName())
+                    .set("availabilityStatus", course.getAvailabilityStatus())
+                    .set("endDate", course.getEndDate())
+                    .set("endTime", course.getEndTime())
+                    .set("instructors", course.getInstructors())
+                    .set("keywords", course.getKeywords())
+                    .set("location", course.getLocation())
+                    .set("maxCapacity", course.getMaxCapacity())
+                    .set("price", course.getPrice())
+                    .set("startDate", course.getStartDate())
+                    .set("startTime", course.getStartTime());
 
-            Query<Course> updateQuery = courseDAO.createQuery().field(Mapper.ID_KEY).equal(s.getId());
+            Query<Course> updateQuery = courseDAO.createQuery().field(Mapper.ID_KEY).equal(course.getId());
             courseDAO.update(updateQuery, ops);
         }
     }

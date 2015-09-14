@@ -1,8 +1,8 @@
-package edu.sjsu.cohort6.esp.dao;
+package edu.sjsu.cohort6.esp.dao.test;
 
 
-import edu.sjsu.cohort6.esp.dao.mongodb.Course;
-import edu.sjsu.cohort6.esp.dao.mongodb.Student;
+import edu.sjsu.cohort6.esp.dao.test.mongodb.Course;
+import edu.sjsu.cohort6.esp.dao.test.mongodb.Student;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public interface DBClient extends AutoCloseable {
     List<Student> fetchStudents(List<String> studentIdsList);
 
     // Course
-    void addCourse(List<Course> courseList);
+    List<String> addCourse(List<Course> courseList);
     long removeCourses(List<String> courseIdsList);
     void updateCourses(List<Course> courseList);
     List<Course> fetchCourses(List<String> courseIdsList);

@@ -1,7 +1,9 @@
-package edu.sjsu.cohort6.esp.dao;
+package edu.sjsu.cohort6.esp.dao.test;
 
-import edu.sjsu.cohort6.esp.dao.mongodb.Course;
-import edu.sjsu.cohort6.esp.dao.mongodb.Student;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import edu.sjsu.cohort6.esp.dao.test.mongodb.Course;
+import edu.sjsu.cohort6.esp.dao.test.mongodb.Student;
 
 import java.util.List;
 
@@ -9,6 +11,12 @@ import java.util.List;
  * Created by rwatsh on 9/13/15.
  */
 public class MockDBClient implements DBClient {
+
+    @Inject
+    private MockDBClient(@Assisted("server") String server, @Assisted("port") int port, @Assisted String dbName) {
+
+    }
+
     @Override
     public void dropDB(String dbName) {
 
@@ -46,8 +54,9 @@ public class MockDBClient implements DBClient {
     }
 
     @Override
-    public void addCourse(List<Course> courseList) {
+    public List<String> addCourse(List<Course> courseList) {
 
+        return null;
     }
 
     @Override
