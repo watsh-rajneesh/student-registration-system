@@ -3,11 +3,11 @@ package edu.sjsu.cohort6.esp.dao.test;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Module;
+import edu.sjsu.cohort6.esp.common.Course;
+import edu.sjsu.cohort6.esp.common.Student;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.dao.DBFactory;
 import edu.sjsu.cohort6.esp.dao.DatabaseModule;
-import edu.sjsu.cohort6.esp.common.Course;
-import edu.sjsu.cohort6.esp.common.Student;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
@@ -101,11 +101,15 @@ public class DBClientTest {
     @Test
     public void testEnrollStudents() throws Exception {
         List<String> insertedIds = testCreateStudents();
+        List<String> courseIds = testCreateCourse();
         Assert.assertNotNull(insertedIds);
+        Assert.assertNotNull(courseIds);
         List<Student> students = client.fetchStudents(insertedIds);
+        List<Course> courses = client.fetchCourses(courseIds);
         Assert.assertNotNull(students);
+        Assert.assertNotNull(courses);
         for (Student s : students) {
-            s.setLastName("test");
+            s.getCourseRefs().addAll(courses);
         }
         log.info("Student modified: " + students);
         client.updateStudents(students);
