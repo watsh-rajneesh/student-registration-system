@@ -1,4 +1,4 @@
-package edu.sjsu.cohort6.esp.dao.mongodb;
+package edu.sjsu.cohort6.esp.common;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
@@ -18,10 +18,8 @@ import java.util.List;
          "Thomas Hildebrand",
          "Aktouf"
      ],
-     "startTime" : ISODate("1970-01-01T18:30:00Z"),
-     "endTime" : ISODate("1970-01-01T21:00:00Z"),
-     "startDate" : ISODate("2015-10-10T07:00:00Z"),
-     "endDate" : ISODate("2015-11-10T08:00:00Z"),
+     "startTime" : ISODate("2015-10-10T07:00:00Z"),
+     "endTime" : ISODate("2015-11-10T08:00:00Z"),
      "availabilityStatus" : 1,
      "maxCapacity" : 20,
      "price" : 200,
@@ -48,8 +46,6 @@ public class Course {
     private List<String> instructors;
     private Date startTime;
     private Date endTime;
-    private Date startDate;
-    private Date endDate;
     private Integer availabilityStatus;
     private Integer maxCapacity;
     private Double price;
@@ -70,8 +66,6 @@ public class Course {
         private List<String> instructors;
         private Date startTime;
         private Date endTime;
-        private Date startDate;
-        private Date endDate;
         private Integer availabilityStatus = 1;
         private Integer maxCapacity;
         private Double price = 0.0;
@@ -96,16 +90,6 @@ public class Course {
 
         public Builder endTime(Date endTime) {
             this.endTime = endTime;
-            return this;
-        }
-
-        public Builder startDate(Date startDate) {
-            this.startDate = startDate;
-            return this;
-        }
-
-        public Builder endDate(Date endDate) {
-            this.endDate = endDate;
             return this;
         }
 
@@ -142,14 +126,12 @@ public class Course {
     private Course(Builder b) {
         this.availabilityStatus = b.availabilityStatus;
         this.courseName = b.courseName;
-        this.endDate = b.endDate;
         this.endTime = b.endTime;
         this.instructors = b.instructors;
         this.keywords = b.keywords;
         this.location = b.location;
         this.maxCapacity = b.maxCapacity;
         this.price = b.price;
-        this.startDate = b.startDate;
         this.startTime = b.startTime;
         //this.studentRefs = b.studentRefs;
     }
@@ -192,22 +174,6 @@ public class Course {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
     }
 
     public Integer getAvailabilityStatus() {
@@ -266,8 +232,6 @@ public class Course {
                 ", instructors=" + instructors +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
                 ", availabilityStatus=" + availabilityStatus +
                 ", maxCapacity=" + maxCapacity +
                 ", price=" + price +

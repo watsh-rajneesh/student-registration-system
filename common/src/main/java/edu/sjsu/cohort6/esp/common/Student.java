@@ -1,4 +1,4 @@
-package edu.sjsu.cohort6.esp.dao.mongodb;
+package edu.sjsu.cohort6.esp.common;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
@@ -19,6 +19,16 @@ import java.util.List;
 
 /**
  * Student entity.
+ * {
+     "_id" : ObjectId("55f6f9fcd3fde80ee829ef4c"),
+     "className" : "edu.sjsu.cohort6.esp.common.Student",
+     "firstName" : "Watsh",
+     "lastName" : "test",
+     "emailId" : "watsh.rajneesh@sjsu.edu",
+     "passwordHash" : "5f4dcc3b5aa765d61d8327deb882cf99",
+     "lastUpdated" : ISODate("2015-09-14T16:46:52.352Z"),
+     "courseRefs" : [ ]
+ }
  *
  * @author rwatsh
  */

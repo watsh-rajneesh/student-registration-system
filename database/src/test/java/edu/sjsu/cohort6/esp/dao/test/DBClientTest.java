@@ -6,8 +6,8 @@ import com.google.inject.Module;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.dao.DBFactory;
 import edu.sjsu.cohort6.esp.dao.DatabaseModule;
-import edu.sjsu.cohort6.esp.dao.mongodb.Course;
-import edu.sjsu.cohort6.esp.dao.mongodb.Student;
+import edu.sjsu.cohort6.esp.common.Course;
+import edu.sjsu.cohort6.esp.common.Student;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
@@ -142,10 +142,8 @@ public class DBClientTest {
                 .maxCapacity(20)
                 .price(200.0)
                 .availabilityStatus(Course.AvailabilityStatus.AVAILABLE.getValue())
-                .startDate(getDateFromString("10-10-2015"))
-                .endDate(getDateFromString("11-10-2015"))
-                .startTime(getTimeFromString("10:30"))
-                .endTime(getTimeFromString("13:00"))
+                .startTime(getDateFromString("10-10-2015 10:30"))
+                .endTime(getDateFromString("11-10-2015 13:00"))
                 .instructors(instructors)
                 .location("Santa Clara, CA")
                 .keywords(keywords)
@@ -164,12 +162,12 @@ public class DBClientTest {
 
 
     private Date getDateFromString(String dateInString) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("M-dd-yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("M-dd-yyyy HH:mm");
         return sdf.parse(dateInString);
     }
 
     private Date getTimeFromString(String timeInString) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         return sdf.parse(timeInString);
     }
 

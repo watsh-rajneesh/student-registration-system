@@ -3,6 +3,8 @@ package edu.sjsu.cohort6.esp.dao.mongodb;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.mongodb.MongoClient;
+import edu.sjsu.cohort6.esp.common.Course;
+import edu.sjsu.cohort6.esp.common.Student;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
@@ -199,14 +201,14 @@ public class MongoDBClient implements DBClient {
             UpdateOperations<Course> ops = courseDAO.createUpdateOperations()
                     .set("courseName", course.getCourseName())
                     .set("availabilityStatus", course.getAvailabilityStatus())
-                    .set("endDate", course.getEndDate())
+                    //.set("endDate", course.getEndDate())
                     .set("endTime", course.getEndTime())
                     .set("instructors", course.getInstructors())
                     .set("keywords", course.getKeywords())
                     .set("location", course.getLocation())
                     .set("maxCapacity", course.getMaxCapacity())
                     .set("price", course.getPrice())
-                    .set("startDate", course.getStartDate())
+                    //.set("startDate", course.getStartDate())
                     .set("startTime", course.getStartTime());
 
             Query<Course> updateQuery = courseDAO.createQuery().field(Mapper.ID_KEY).equal(course.getId());

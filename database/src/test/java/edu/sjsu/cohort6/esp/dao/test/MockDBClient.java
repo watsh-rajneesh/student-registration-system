@@ -3,8 +3,8 @@ package edu.sjsu.cohort6.esp.dao.test;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import edu.sjsu.cohort6.esp.dao.DBClient;
-import edu.sjsu.cohort6.esp.dao.mongodb.Course;
-import edu.sjsu.cohort6.esp.dao.mongodb.Student;
+import edu.sjsu.cohort6.esp.common.Course;
+import edu.sjsu.cohort6.esp.common.Student;
 
 import java.util.List;
 

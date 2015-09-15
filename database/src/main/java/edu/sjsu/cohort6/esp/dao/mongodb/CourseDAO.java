@@ -1,6 +1,7 @@
 package edu.sjsu.cohort6.esp.dao.mongodb;
 
 import com.mongodb.MongoClient;
+import edu.sjsu.cohort6.esp.common.Course;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.dao.BasicDAO;
 
