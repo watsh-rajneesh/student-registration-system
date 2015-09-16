@@ -1,5 +1,6 @@
 package edu.sjsu.cohort6.esp.common;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
 
@@ -136,6 +137,7 @@ public class Course {
         //this.studentRefs = b.studentRefs;
     }
 
+    @JsonProperty
     public ObjectId getId() {
         return id;
     }
@@ -144,6 +146,7 @@ public class Course {
         this.id = id;
     }
 
+    @JsonProperty
     public String getCourseName() {
         return courseName;
     }
@@ -152,6 +155,7 @@ public class Course {
         this.courseName = courseName;
     }
 
+    @JsonProperty
     public List<String> getInstructors() {
         return instructors;
     }
@@ -160,6 +164,7 @@ public class Course {
         this.instructors = instructors;
     }
 
+    @JsonProperty
     public Date getStartTime() {
         return startTime;
     }
@@ -168,6 +173,7 @@ public class Course {
         this.startTime = startTime;
     }
 
+    @JsonProperty
     public Date getEndTime() {
         return endTime;
     }
@@ -176,6 +182,7 @@ public class Course {
         this.endTime = endTime;
     }
 
+    @JsonProperty
     public Integer getAvailabilityStatus() {
         return availabilityStatus;
     }
@@ -184,6 +191,7 @@ public class Course {
         this.availabilityStatus = availabilityStatus;
     }
 
+    @JsonProperty
     public Integer getMaxCapacity() {
         return maxCapacity;
     }
@@ -192,6 +200,7 @@ public class Course {
         this.maxCapacity = maxCapacity;
     }
 
+    @JsonProperty
     public Double getPrice() {
         return price;
     }
@@ -200,6 +209,7 @@ public class Course {
         this.price = price;
     }
 
+    @JsonProperty
     public String getLocation() {
         return location;
     }
@@ -208,6 +218,7 @@ public class Course {
         this.location = location;
     }
 
+    @JsonProperty
     public List<String> getKeywords() {
         return keywords;
     }
