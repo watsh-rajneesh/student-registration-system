@@ -11,6 +11,7 @@ import edu.sjsu.cohort6.esp.dao.DatabaseModule;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class DBClientTest {
     public static final String TESTREG = "testreg";
     private static final Logger log = Logger.getLogger(DBClientTest.class.getName());
     private DBClient client;
+    private long startTime;
 
     @BeforeTest
     public void setUp() throws Exception {
@@ -49,11 +51,16 @@ public class DBClientTest {
     @BeforeMethod
     public void createDB() {
         client.useDB(TESTREG);
+        log.info("********************");
+        startTime = System.currentTimeMillis();
     }
 
     @AfterMethod
     public void dropDB() {
         //client.dropDB(TESTREG);
+        long endTime = System.currentTimeMillis();
+        long diff = endTime - startTime;
+        log.info(MessageFormat.format("********* Time taken: {0} ms", diff));
     }
 
 

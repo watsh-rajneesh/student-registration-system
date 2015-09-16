@@ -1,14 +1,8 @@
 package edu.sjsu.cohort6.esp.common;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Field;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Index;
-import org.mongodb.morphia.annotations.Indexed;
-import org.mongodb.morphia.annotations.Indexes;
-import org.mongodb.morphia.annotations.PrePersist;
-import org.mongodb.morphia.annotations.Reference;
+import org.mongodb.morphia.annotations.*;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -19,6 +13,10 @@ import java.util.List;
 
 /**
  * Student entity.
+ *
+ * Some annotations are per morphia and some per dropwizard frameworks.
+ * This POJO will be used across DB, Web service and UI.
+ *
  * {
      "_id" : ObjectId("55f6f9fcd3fde80ee829ef4c"),
      "className" : "edu.sjsu.cohort6.esp.common.Student",
@@ -80,6 +78,7 @@ public class Student {
         return hashtext;
     }
 
+    @JsonProperty
     public ObjectId getId() {
         return id;
     }
@@ -88,6 +87,7 @@ public class Student {
         this.id = id;
     }
 
+    @JsonProperty
     public String getFirstName() {
         return firstName;
     }
@@ -96,6 +96,7 @@ public class Student {
         this.firstName = firstName;
     }
 
+    @JsonProperty
     public String getLastName() {
         return lastName;
     }
@@ -104,6 +105,7 @@ public class Student {
         this.lastName = lastName;
     }
 
+    @JsonProperty
     public String getEmailId() {
         return emailId;
     }
@@ -112,6 +114,7 @@ public class Student {
         this.emailId = emailId;
     }
 
+    @JsonProperty
     public String getPasswordHash() {
         return passwordHash;
     }
@@ -120,6 +123,7 @@ public class Student {
         this.passwordHash = passwordHash;
     }
 
+    @JsonProperty
     public List<Course> getCourseRefs() {
         return courseRefs;
     }
