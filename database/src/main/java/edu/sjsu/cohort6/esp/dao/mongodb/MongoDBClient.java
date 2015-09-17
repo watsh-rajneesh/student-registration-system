@@ -94,7 +94,6 @@ public class MongoDBClient implements DBClient {
         studentDAO = new StudentDAO(mongoClient, morphia, dbName);
         courseDAO = new CourseDAO(mongoClient, morphia, dbName);
         morphiaDatastore = morphia.createDatastore(mongoClient, dbName);
-        //morphiaDatastore.ensureIndexes();
     }
 
     @Override
@@ -105,12 +104,10 @@ public class MongoDBClient implements DBClient {
     @Override
     public void useDB(String dbName) {
         morphiaDatastore = morphia.createDatastore(mongoClient, dbName);
-        //morphiaDatastore.ensureIndexes();
     }
 
     @Override
     public List<String> addStudents(List<Student> studentList) {
-        //morphiaDatastore.save(studentList);
         List<String> insertedIds = new ArrayList<>();
         for (Student s : studentList) {
             insertedIds.add(((ObjectId)studentDAO.save(s).getId()).toString());
@@ -120,7 +117,6 @@ public class MongoDBClient implements DBClient {
 
     @Override
     public long removeStudents(List<String> studentIdsList) {
-        //return morphiaDatastore.delete(Student.class, studentIdsList).getN();
         List<ObjectId> objectIds = new ArrayList<>();
         for (String id : studentIdsList) {
             objectIds.add(new ObjectId(id));
@@ -131,17 +127,6 @@ public class MongoDBClient implements DBClient {
 
     @Override
     public void updateStudents(List<Student> studentList) {
-        /*for (Student s : studentList) {
-            UpdateOperations<Student> ops = morphiaDatastore.createUpdateOperations(Student.class)
-                    .set("firstName", s.getFirstName())
-                    .set("lastName", s.getLastName())
-                    .set("emailId", s.getEmailId())
-                    .set("passwordHash", s.getPasswordHash())
-                    .set("courseRefs", s.getCourseRefs());
-
-            Query<Student> updateQuery = morphiaDatastore.createQuery(Student.class).field(Mapper.ID_KEY).equal(s.getId());
-            morphiaDatastore.update(updateQuery, ops);
-        }*/
         for (Student s : studentList) {
             UpdateOperations<Student> ops = studentDAO.createUpdateOperations()
                     .set("firstName", s.getFirstName())
@@ -157,14 +142,6 @@ public class MongoDBClient implements DBClient {
 
     @Override
     public void updateStudents(List<Student> studentList, List<Course> courseList) {
-        /*UpdateOperations<Student> ops = morphiaDatastore.createUpdateOperations(Student.class)
-                .set("courseRefs", courseList);
-        List<ObjectId> objectIds = new ArrayList<>();
-        for (Student s : studentList) {
-            objectIds.add(s.getId());
-        }
-        Query<Student> query = morphiaDatastore.createQuery(Student.class).field(Mapper.ID_KEY).in(objectIds);
-        morphiaDatastore.update(query, ops);*/
         UpdateOperations<Student> ops = studentDAO.createUpdateOperations()
                 .set("courseRefs", courseList);
         List<ObjectId> objectIds = new ArrayList<>();
@@ -181,7 +158,6 @@ public class MongoDBClient implements DBClient {
         for (String id : studentIdsList) {
             objectIds.add(new ObjectId(id));
         }
-        /*return morphiaDatastore.find(Student.class).field(Mapper.ID_KEY).in(objectIds).asList();*/
 
         Query<Student> query = studentDAO.createQuery().field(Mapper.ID_KEY).in(objectIds);
         QueryResults<Student> results = studentDAO.find(query);
@@ -200,7 +176,6 @@ public class MongoDBClient implements DBClient {
 
     @Override
     public long removeCourses(List<String> courseIdsList) {
-        //return morphiaDatastore.delete(Course.class, courseIdsList).getN();
         List<ObjectId> objectIds = new ArrayList<>();
         for (String id : courseIdsList) {
             objectIds.add(new ObjectId(id));
