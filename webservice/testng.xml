@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="DBTests" verbose="10" >
+    <test name="Regression1"   >
+        <packages>
+            <package name="edu.sjsu.cohort6.esp.rest.test" />
+        </packages>
+    </test>
+</suite>
