@@ -6,6 +6,7 @@ import com.google.inject.Module;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.dao.DBFactory;
 import edu.sjsu.cohort6.esp.dao.DatabaseModule;
+import edu.sjsu.cohort6.esp.service.rest.StudentResource;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -38,6 +39,7 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
     }
     @Override
     public void run(StudentRegistrationServiceConfiguration studentRegistrationServiceConfiguration, Environment environment) throws Exception {
-
+        final StudentResource studentResource = new StudentResource();
+        environment.jersey().register(studentResource);
     }
 }

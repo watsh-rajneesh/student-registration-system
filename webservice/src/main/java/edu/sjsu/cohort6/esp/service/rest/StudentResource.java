@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +19,10 @@ import java.util.List;
 public class StudentResource {
     @GET
     public List<Student> getStudent(@QueryParam("id") Optional<String> studentId) {
+        Student s = new Student("Watsh", "Rajneesh", "watsh.rajneesh@sjsu.edu", "password");
 
+        ArrayList<Student> students = new ArrayList<>();
+        students.add(s);
+        return students;
     }
 }
