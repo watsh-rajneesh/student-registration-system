@@ -17,11 +17,13 @@ import java.util.List;
 @Path("/students")
 @Produces(MediaType.APPLICATION_JSON)
 public class StudentResource {
+
     @GET
     public List<Student> getStudent(@QueryParam("id") Optional<String> studentId) {
         Student s = new Student("Watsh", "Rajneesh", "watsh.rajneesh@sjsu.edu", "password");
 
         ArrayList<Student> students = new ArrayList<>();
+
         students.add(s);
         return students;
     }
