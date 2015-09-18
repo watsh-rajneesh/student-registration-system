@@ -14,13 +14,47 @@
 
 package edu.sjsu.cohort6.esp.service.rest.test;
 
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.logging.Logger;
+
 /**
  * Created by rwatsh on 9/17/15.
  */
 public class StudentResourceTest {
 
-    @org.testng.annotations.Test
-    public void testGetStudent() throws Exception {
+    public static final String BASE_URI = "http://localhost:8080";
+    private Client client;
+    private WebTarget webTarget;
+    private static final Logger log = Logger.getLogger(StudentResourceTest.class.getName());
+
+    @BeforeMethod
+    public void setUp() throws Exception {
+        client = ClientBuilder.newClient();
+        webTarget = client.target(BASE_URI);
 
     }
+
+    @org.testng.annotations.Test
+    public void testGetStudent() throws Exception {
+        WebTarget studentWebTarget = webTarget.path("/students");
+        Invocation.Builder invocationBuilder =
+                studentWebTarget.request(MediaType.APPLICATION_JSON_TYPE);
+        Response response = invocationBuilder.get();
+        logResponse(response);
+        Assert.assertTrue(response.getStatus() == 200);
+    }
+
+    private void logResponse(Response response) {
+        log.info(response.toString());
+        log.info(response.readEntity(String.class));
+    }
+
 }

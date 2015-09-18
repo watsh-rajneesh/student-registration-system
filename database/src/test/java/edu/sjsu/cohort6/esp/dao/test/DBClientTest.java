@@ -136,6 +136,7 @@ public class DBClientTest {
         client.updateStudents(students);
         students = client.fetchStudents(insertedIds);
         Assert.assertNotNull(students);
+        Assert.assertTrue(!students.get(0).getCourseRefs().isEmpty());
         log.info("Student updated in DB: " + students);
     }
 
