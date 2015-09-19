@@ -14,6 +14,7 @@
 
 package edu.sjsu.cohort6.esp.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
@@ -53,9 +54,12 @@ import java.util.List;
 @Indexes(
         @Index(value = "courseName", fields = @Field("courseName"))
 )
+@JsonIgnoreProperties({"_id"})
 public class Course {
     @Id
     private ObjectId _id;
+    @Transient
+    private String id;
     @Indexed(name="courseName", unique=true,dropDups=true)
     private String courseName;
     private List<String> instructors;
@@ -151,13 +155,31 @@ public class Course {
         //this.studentRefs = b.studentRefs;
     }
 
-    @JsonProperty
     public ObjectId get_id() {
         return _id;
     }
 
-    public void setId(ObjectId id) {
+    public void set_id(ObjectId id) {
         this._id = id;
+    }
+
+    @JsonProperty
+    public String getId() {
+        return _id != null ? _id.toHexString() : null;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        this._id = new ObjectId(id);
+    }
+
+    @JsonProperty
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 
     @JsonProperty
@@ -252,7 +274,7 @@ public class Course {
     @Override
     public String toString() {
         return "Course{" +
-                "id=" + _id +
+                "id=" + (_id != null ?_id.toHexString() : _id ) +
                 ", courseName='" + courseName + '\'' +
                 ", instructors=" + instructors +
                 ", startTime=" + startTime +

@@ -53,6 +53,8 @@ import java.util.List;
 public class Student {
     @Id
     private ObjectId _id;
+    @Transient
+    private String id;
     private String firstName;
     private String lastName;
     @Indexed(name="emailId", unique=true,dropDups=true)
@@ -94,13 +96,31 @@ public class Student {
         return hashtext;
     }
 
-    @JsonProperty
     public ObjectId get_id() {
         return _id;
     }
 
-    public void setId(ObjectId id) {
-        this._id = id;
+    public void set_id(ObjectId _id) {
+        this._id = _id;
+    }
+
+    @JsonProperty
+    public String getId() {
+        return _id != null ? _id.toHexString() : null;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        this._id = new ObjectId(id);
+    }
+
+    @JsonProperty
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 
     @JsonProperty
@@ -151,7 +171,7 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-                "id=" + _id +
+                "id=" + (_id != null ?_id.toHexString() : _id) +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", emailId='" + emailId + '\'' +
