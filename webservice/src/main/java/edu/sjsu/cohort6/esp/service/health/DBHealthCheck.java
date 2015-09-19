@@ -12,30 +12,28 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.esp.service;
+package edu.sjsu.cohort6.esp.service.health;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
+import com.codahale.metrics.health.HealthCheck;
+import edu.sjsu.cohort6.esp.dao.DBClient;
 
 /**
- * Created by rwatsh on 9/14/15.
+ * Created by rwatsh on 9/18/15.
  */
-public class StudentRegistrationServiceConfiguration extends Configuration {
-    @Valid
-    @NotNull
-    private DBConfig dbConfig = new DBConfig();
+public class DBHealthCheck extends HealthCheck{
+    private DBClient client;
 
-    @JsonProperty("database")
-    public DBConfig getDbConfig() {
-        return dbConfig;
+    public DBHealthCheck(DBClient client) {
+        this.client = client;
     }
 
-    @JsonProperty("database")
-    public void setDbConfig(DBConfig dbConfig) {
-        this.dbConfig = dbConfig;
+    @Override
+    protected Result check() throws Exception {
+
+        if (client.checkHealth()) {
+            return Result.healthy();
+        } else {
+            return Result.unhealthy("Cannot connect to DB " + client.getConnectString());
+        }
     }
 }

@@ -19,7 +19,6 @@ import org.testng.annotations.BeforeMethod;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -27,6 +26,10 @@ import java.util.logging.Logger;
 
 /**
  * Created by rwatsh on 9/17/15.
+ *
+ * Refer - https://jersey.java.net/documentation/latest/client.html
+ *
+ * for more on the Jersey client APIs.
  */
 public class StudentResourceTest {
 
@@ -44,10 +47,9 @@ public class StudentResourceTest {
 
     @org.testng.annotations.Test
     public void testGetStudent() throws Exception {
-        WebTarget studentWebTarget = webTarget.path("/students");
-        Invocation.Builder invocationBuilder =
-                studentWebTarget.request(MediaType.APPLICATION_JSON_TYPE);
-        Response response = invocationBuilder.get();
+        Response response = webTarget.path("/students")
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
         logResponse(response);
         Assert.assertTrue(response.getStatus() == 200);
     }

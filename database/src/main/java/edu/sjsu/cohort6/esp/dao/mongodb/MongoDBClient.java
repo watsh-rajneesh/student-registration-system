@@ -28,6 +28,7 @@ import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.QueryResults;
 import org.mongodb.morphia.query.UpdateOperations;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,6 +108,21 @@ public class MongoDBClient implements DBClient {
     }
 
     @Override
+    public boolean checkHealth() {
+        try {
+            morphiaDatastore.getDB().getStats();
+            return true;
+        } catch(Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public String getConnectString() {
+        return MessageFormat.format("DB Connect Info: server [{0}], port [{1}], dbName [{2}]", server, port, dbName);
+    }
+
+    @Override
     public List<String> addStudents(List<Student> studentList) {
         List<String> insertedIds = new ArrayList<>();
         for (Student s : studentList) {
@@ -135,7 +151,7 @@ public class MongoDBClient implements DBClient {
                     .set("passwordHash", s.getPasswordHash())
                     .set("courseRefs", s.getCourseRefs());
 
-            Query<Student> updateQuery = morphiaDatastore.createQuery(Student.class).field(Mapper.ID_KEY).equal(s.getId());
+            Query<Student> updateQuery = morphiaDatastore.createQuery(Student.class).field(Mapper.ID_KEY).equal(s.get_id());
             studentDAO.update(updateQuery, ops);
         }
     }
@@ -146,7 +162,7 @@ public class MongoDBClient implements DBClient {
                 .set("courseRefs", courseList);
         List<ObjectId> objectIds = new ArrayList<>();
         for (Student s : studentList) {
-            objectIds.add(s.getId());
+            objectIds.add(s.get_id());
         }
         Query<Student> query = studentDAO.createQuery().field(Mapper.ID_KEY).in(objectIds);
         studentDAO.update(query, ops);
@@ -155,11 +171,18 @@ public class MongoDBClient implements DBClient {
     @Override
     public List<Student> fetchStudents(List<String> studentIdsList) {
         List<ObjectId> objectIds = new ArrayList<>();
-        for (String id : studentIdsList) {
-            objectIds.add(new ObjectId(id));
-        }
+        Query<Student> query =  null;
 
-        Query<Student> query = studentDAO.createQuery().field(Mapper.ID_KEY).in(objectIds);
+        if (studentIdsList != null) {
+            for (String id : studentIdsList) {
+                if (id != null) {
+                    objectIds.add(new ObjectId(id));
+                }
+            }
+        }
+        query = objectIds != null && !objectIds.isEmpty()
+                ? studentDAO.createQuery().field(Mapper.ID_KEY).in(objectIds)
+                : studentDAO.createQuery();
         QueryResults<Student> results = studentDAO.find(query);
         return results.asList();
     }
@@ -200,7 +223,7 @@ public class MongoDBClient implements DBClient {
                     //.set("startDate", course.getStartDate())
                     .set("startTime", course.getStartTime());
 
-            Query<Course> updateQuery = courseDAO.createQuery().field(Mapper.ID_KEY).equal(course.getId());
+            Query<Course> updateQuery = courseDAO.createQuery().field(Mapper.ID_KEY).equal(course.get_id());
             courseDAO.update(updateQuery, ops);
         }
     }

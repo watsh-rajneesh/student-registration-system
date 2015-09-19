@@ -29,6 +29,9 @@ public interface DBClient extends AutoCloseable {
     // Common
     void dropDB(String dbName);
     void useDB(String dbName);
+    boolean checkHealth();
+    String getConnectString();
+
 
     // Student
     List<String> addStudents(List<Student> studentList);

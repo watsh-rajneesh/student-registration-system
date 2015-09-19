@@ -14,6 +14,7 @@
 
 package edu.sjsu.cohort6.esp.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
@@ -48,9 +49,10 @@ import java.util.List;
 @Indexes(
         @Index(value = "emailId", fields = @Field("emailId"))
 )
+@JsonIgnoreProperties({"_id"})
 public class Student {
     @Id
-    private ObjectId id;
+    private ObjectId _id;
     private String firstName;
     private String lastName;
     @Indexed(name="emailId", unique=true,dropDups=true)
@@ -93,12 +95,12 @@ public class Student {
     }
 
     @JsonProperty
-    public ObjectId getId() {
-        return id;
+    public ObjectId get_id() {
+        return _id;
     }
 
     public void setId(ObjectId id) {
-        this.id = id;
+        this._id = id;
     }
 
     @JsonProperty
@@ -149,7 +151,7 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-                "id=" + id +
+                "id=" + _id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", emailId='" + emailId + '\'' +

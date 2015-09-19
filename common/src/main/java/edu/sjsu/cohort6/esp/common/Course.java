@@ -55,7 +55,7 @@ import java.util.List;
 )
 public class Course {
     @Id
-    private ObjectId id;
+    private ObjectId _id;
     @Indexed(name="courseName", unique=true,dropDups=true)
     private String courseName;
     private List<String> instructors;
@@ -152,12 +152,12 @@ public class Course {
     }
 
     @JsonProperty
-    public ObjectId getId() {
-        return id;
+    public ObjectId get_id() {
+        return _id;
     }
 
     public void setId(ObjectId id) {
-        this.id = id;
+        this._id = id;
     }
 
     @JsonProperty
@@ -252,7 +252,7 @@ public class Course {
     @Override
     public String toString() {
         return "Course{" +
-                "id=" + id +
+                "id=" + _id +
                 ", courseName='" + courseName + '\'' +
                 ", instructors=" + instructors +
                 ", startTime=" + startTime +

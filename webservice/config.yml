@@ -1,7 +1,7 @@
 database:
   server: localhost
   port: 27017
-  dbName: student_enrollment_db
+  dbName: testreg
 
 # use the simple server factory if you only want to run on a single port
 #server:
@@ -16,11 +16,11 @@ server:
   applicationConnectors:
     - type: http
       port: 8080
-    - type: https
-      port: 8443
-      keyStorePath: studentreg.keystore
-      keyStorePassword: password
-      validateCerts: false
+    #- type: https
+    #  port: 8443
+    #  keyStorePath: example.keystore
+    #  keyStorePassword: example
+    #  validateCerts: false
 
 # Logging settings.
 logging:
@@ -47,4 +47,4 @@ logging:
       archivedLogFilenamePattern: /tmp/studentreg-%d{yyyy-MM-dd}-%i.log.gz
       archivedFileCount: 7
       timeZone: UTC
-      maxFileSize: 10MB
+      #maxFileSize: 10MB

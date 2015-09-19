@@ -149,6 +149,13 @@ public class DBClientTest {
     }
 
     @Test
+    public void testFetchStudentsNull() {
+        testCreateStudents();
+        List<Student> students = client.fetchStudents(null);
+        Assert.assertNotNull(students);
+    }
+
+    @Test
     public void testAddCourse() throws ParseException {
         testCreateCourse();
     }

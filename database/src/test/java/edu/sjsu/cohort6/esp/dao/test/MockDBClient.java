@@ -43,6 +43,16 @@ public class MockDBClient implements DBClient {
     }
 
     @Override
+    public boolean checkHealth() {
+        return false;
+    }
+
+    @Override
+    public String getConnectString() {
+        return null;
+    }
+
+    @Override
     public List<String> addStudents(List<Student> studentList) {
 
         return null;

@@ -20,6 +20,7 @@ import com.google.inject.Module;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.dao.DBFactory;
 import edu.sjsu.cohort6.esp.dao.DatabaseModule;
+import edu.sjsu.cohort6.esp.service.health.DBHealthCheck;
 import edu.sjsu.cohort6.esp.service.rest.StudentResource;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -53,8 +54,9 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
     }
     @Override
     public void run(StudentRegistrationServiceConfiguration studentRegistrationServiceConfiguration, Environment environment) throws Exception {
-        final StudentResource studentResource = new StudentResource();
+        client = studentRegistrationServiceConfiguration.getDbConfig().build(environment);
+        environment.healthChecks().register("database", new DBHealthCheck(client));
+        final StudentResource studentResource = new StudentResource(client);
         environment.jersey().register(studentResource);
-        //environment.getApplicationContext().setAttribute("dbClient", client);
     }
 }

@@ -16,12 +16,11 @@ package edu.sjsu.cohort6.esp.service.rest;
 
 import com.google.common.base.Optional;
 import edu.sjsu.cohort6.esp.common.Student;
+import edu.sjsu.cohort6.esp.dao.DBClient;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,14 +30,39 @@ import java.util.List;
 @Path("/students")
 @Produces(MediaType.APPLICATION_JSON)
 public class StudentResource {
+    private DBClient dbClient;
+
+    public StudentResource(DBClient client) {
+        this.dbClient = client;
+    }
 
     @GET
-    public List<Student> getStudent(@QueryParam("id") Optional<String> studentId) {
-        Student s = new Student("Watsh", "Rajneesh", "watsh.rajneesh@sjsu.edu", "password");
-
-        ArrayList<Student> students = new ArrayList<>();
-
-        students.add(s);
-        return students;
+    public List<Student> fetch(@QueryParam("id") Optional<String> studentId) {
+        List<String> studentIds = new ArrayList<>();
+        if (studentId != null && !studentId.equals(Optional.<String>absent())) {
+            studentIds.add(studentId.toString());
+        } else {
+            studentIds = null;
+        }
+        List<Student> studentList = dbClient.fetchStudents(studentIds);
+        if (studentList != null) {
+            return studentList;
+        } else {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
     }
+
+
+    /*@PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void createStudent(JSONObject inputJsonObj) throws Exception {
+        String input = (String) inputJsonObj.get("input");
+        String output = "The input you sent is :" + input;
+        JSONObject outputJsonObj = new JSONObject();
+        outputJsonObj.put("output", output);
+
+        return outputJsonObj;
+    }*/
+
 }
