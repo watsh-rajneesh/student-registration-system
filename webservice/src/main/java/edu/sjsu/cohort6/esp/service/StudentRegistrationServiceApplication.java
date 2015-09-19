@@ -14,12 +14,9 @@
 
 package edu.sjsu.cohort6.esp.service;
 
-import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Module;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.dao.DBFactory;
-import edu.sjsu.cohort6.esp.dao.DatabaseModule;
 import edu.sjsu.cohort6.esp.service.health.DBHealthCheck;
 import edu.sjsu.cohort6.esp.service.rest.StudentResource;
 import io.dropwizard.Application;
@@ -48,9 +45,7 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
     @Override
     public void initialize(final Bootstrap<StudentRegistrationServiceConfiguration> bootstrap) {
         // TODO: application initialization
-        Module module = new DatabaseModule();
-        Guice.createInjector(module).injectMembers(this);
-        client = dbFactory.create("localhost", 27017, "esp");
+
     }
     @Override
     public void run(StudentRegistrationServiceConfiguration studentRegistrationServiceConfiguration, Environment environment) throws Exception {
