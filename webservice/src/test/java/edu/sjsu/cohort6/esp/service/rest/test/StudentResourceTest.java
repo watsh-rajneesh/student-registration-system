@@ -15,7 +15,8 @@
 package edu.sjsu.cohort6.esp.service.rest.test;
 
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -38,11 +39,18 @@ public class StudentResourceTest {
     private WebTarget webTarget;
     private static final Logger log = Logger.getLogger(StudentResourceTest.class.getName());
 
-    @BeforeMethod
+    @BeforeClass
     public void setUp() throws Exception {
         client = ClientBuilder.newClient();
         webTarget = client.target(BASE_URI);
 
+    }
+
+    @AfterClass
+    public void tearDown() throws Exception {
+        if (client != null) {
+            client.close();
+        }
     }
 
     @org.testng.annotations.Test
