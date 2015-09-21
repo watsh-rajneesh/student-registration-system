@@ -20,9 +20,9 @@ import edu.sjsu.cohort6.esp.dao.DBFactory;
 import edu.sjsu.cohort6.esp.service.health.DBHealthCheck;
 import edu.sjsu.cohort6.esp.service.rest.StudentResource;
 import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-
 /**
  * Created by rwatsh on 9/14/15.
  */
@@ -44,14 +44,18 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
 
     @Override
     public void initialize(final Bootstrap<StudentRegistrationServiceConfiguration> bootstrap) {
-        // TODO: application initialization
-
+        /*
+         * Register the static html contents to be served from /assets directory and accessible from browser from
+         * http://<host>:<port>/esp
+         */
+        bootstrap.addBundle(new AssetsBundle("/assets", "/esp", "index.html"));
     }
     @Override
     public void run(StudentRegistrationServiceConfiguration studentRegistrationServiceConfiguration, Environment environment) throws Exception {
         client = studentRegistrationServiceConfiguration.getDbConfig().build(environment);
         environment.healthChecks().register("database", new DBHealthCheck(client));
         final StudentResource studentResource = new StudentResource(client);
+        environment.jersey().setUrlPattern("/api/*");
         environment.jersey().register(studentResource);
     }
 }

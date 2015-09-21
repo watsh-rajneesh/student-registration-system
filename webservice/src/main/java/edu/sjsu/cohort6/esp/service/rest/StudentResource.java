@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Created by rwatsh on 9/15/15.
  */
-@Path("/students")
+@Path("/api/students")
 @Produces(MediaType.APPLICATION_JSON)
 public class StudentResource {
     private DBClient dbClient;
