@@ -48,7 +48,7 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
          * Register the static html contents to be served from /assets directory and accessible from browser from
          * http://<host>:<port>/esp
          */
-        bootstrap.addBundle(new AssetsBundle("/assets", "/esp", "app.html"));
+        bootstrap.addBundle(new AssetsBundle("/assets", "/esp", "index.html"));
     }
     @Override
     public void run(StudentRegistrationServiceConfiguration studentRegistrationServiceConfiguration, Environment environment) throws Exception {
