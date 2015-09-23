@@ -49,7 +49,7 @@ import java.util.List;
 @Indexes(
         @Index(value = "emailId", fields = @Field("emailId"))
 )
-@JsonIgnoreProperties({"_id"})
+@JsonIgnoreProperties({"_id", "code", "message"})
 public class Student {
     @Id
     private ObjectId _id;

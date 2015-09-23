@@ -14,10 +14,10 @@
 
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="DBTests" verbose="10" >
-    <test name="Regression1"   >
+<suite name="RestTests" verbose="10" >
+    <test name="Regression"   >
         <packages>
-            <package name="edu.sjsu.cohort6.esp.rest.test" />
+            <package name="edu.sjsu.cohort6.esp.service.rest.test" />
         </packages>
     </test>
 </suite>

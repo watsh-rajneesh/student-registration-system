@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.dao.DBFactory;
 import edu.sjsu.cohort6.esp.service.health.DBHealthCheck;
+import edu.sjsu.cohort6.esp.service.rest.EndpointUtils;
 import edu.sjsu.cohort6.esp.service.rest.StudentResource;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -55,7 +56,7 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
         client = studentRegistrationServiceConfiguration.getDbConfig().build(environment);
         environment.healthChecks().register("database", new DBHealthCheck(client));
         final StudentResource studentResource = new StudentResource(client);
-        environment.jersey().setUrlPattern("/api/*");
+        environment.jersey().setUrlPattern(EndpointUtils.ENDPOINT_ROOT + "/*");
         environment.jersey().register(studentResource);
     }
 }

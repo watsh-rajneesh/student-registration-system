@@ -14,27 +14,35 @@
 
 package edu.sjsu.cohort6.esp.service.rest.test;
 
+import edu.sjsu.cohort6.esp.common.CommonUtils;
+import edu.sjsu.cohort6.esp.common.Student;
+import edu.sjsu.cohort6.esp.service.rest.EndpointUtils;
+import org.bson.types.ObjectId;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
  * Created by rwatsh on 9/17/15.
- *
+ * <p>
  * Refer - https://jersey.java.net/documentation/latest/client.html
- *
+ * <p>
  * for more on the Jersey client APIs.
  */
 public class StudentResourceTest {
 
     public static final String BASE_URI = "http://localhost:8080";
+    public static final String STUDENT_RESOURCE_URI = EndpointUtils.ENDPOINT_ROOT + "/students";
     private Client client;
     private WebTarget webTarget;
     private static final Logger log = Logger.getLogger(StudentResourceTest.class.getName());
@@ -53,18 +61,62 @@ public class StudentResourceTest {
         }
     }
 
-    @org.testng.annotations.Test
-    public void testGetStudent() throws Exception {
-        Response response = webTarget.path("/students")
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .get();
-        logResponse(response);
-        Assert.assertTrue(response.getStatus() == 200);
+    @Test
+    public void testGetStudents() throws Exception {
+        List<Student> studentList  = getStudents();
+        Assert.assertNotNull(studentList);
     }
 
-    private void logResponse(Response response) {
+    private List<Student> getStudents() throws Exception {
+        Response response = webTarget.path(STUDENT_RESOURCE_URI)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
         log.info(response.toString());
-        log.info(response.readEntity(String.class));
+        String respStr = response.readEntity(String.class);
+        List<Student> studentList = CommonUtils.convertJsonArrayToList(respStr, Student.class);
+        log.info(studentList.toString());
+        Assert.assertTrue(response.getStatus() == Response.Status.OK.getStatusCode());
+        return studentList;
+    }
+
+    @Test
+    public void testGetStudent() throws Exception {
+        List<Student> studentList = getStudents();
+        if (studentList != null && !studentList.isEmpty()) {
+            ObjectId id = studentList.get(0).get_id();
+
+            Response response = webTarget.path(STUDENT_RESOURCE_URI)
+                    .queryParam("id", id.toHexString())
+                    .request(MediaType.APPLICATION_JSON_TYPE)
+                    .get();
+            log.info(response.toString());
+            String respStr = response.readEntity(String.class);
+            studentList = CommonUtils.convertJsonArrayToList(respStr, Student.class);
+            log.info(studentList.toString());
+            Assert.assertTrue(response.getStatus() == Response.Status.OK.getStatusCode());
+        }
+
+    }
+
+
+    @Test
+    public void testCreateStudent() throws Exception {
+        Student s = createStudent();
+        Assert.assertNotNull(s);
+    }
+
+    private Student createStudent() throws Exception {
+        Student s = new Student("Watsh", "Rajneesh", "watsh.rajneesh@sjsu.edu", "password");
+        Response response = webTarget.path(STUDENT_RESOURCE_URI)
+                .request()
+                .post(Entity.entity(s, MediaType.APPLICATION_JSON));
+
+        log.info(response.toString());
+        s = response.readEntity(Student.class);
+        //Student student = CommonUtils.convertJsonToObject(respStr, Student.class);
+        log.info(s.toString());
+        Assert.assertTrue(response.getStatus() == Response.Status.OK.getStatusCode());
+        return s;
     }
 
 }

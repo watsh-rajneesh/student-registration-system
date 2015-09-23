@@ -18,16 +18,21 @@ import com.google.common.base.Optional;
 import edu.sjsu.cohort6.esp.common.Student;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.util.ArrayList;
 import java.util.List;
+
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 /**
  * Created by rwatsh on 9/15/15.
  */
-@Path("/api/students")
+@Path(EndpointUtils.ENDPOINT_ROOT + "/students")
 @Produces(MediaType.APPLICATION_JSON)
 public class StudentResource {
     private DBClient dbClient;
@@ -37,32 +42,38 @@ public class StudentResource {
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public List<Student> fetch(@QueryParam("id") Optional<String> studentId) {
         List<String> studentIds = new ArrayList<>();
         if (studentId != null && !studentId.equals(Optional.<String>absent())) {
-            studentIds.add(studentId.toString());
+            studentIds.add(studentId.get());
         } else {
             studentIds = null;
         }
         List<Student> studentList = dbClient.fetchStudents(studentIds);
         if (studentList != null) {
             return studentList;
+            //return Response.ok(studentList).build();
         } else {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            throw new WebApplicationException(NOT_FOUND);
         }
     }
 
-
-    /*@PUT
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public void createStudent(JSONObject inputJsonObj) throws Exception {
-        String input = (String) inputJsonObj.get("input");
-        String output = "The input you sent is :" + input;
-        JSONObject outputJsonObj = new JSONObject();
-        outputJsonObj.put("output", output);
-
-        return outputJsonObj;
-    }*/
+    public Response createStudent(@Valid Student student) throws Exception {
+        try {
+            List<Student> studentList = new ArrayList<>();
+            studentList.add(student);
+            List<String> studentIds = dbClient.addStudents(studentList);
+            return Response.created(UriBuilder.fromResource(getClass())
+                    .build(student, studentIds.get(0)))
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new WebApplicationException(BAD_REQUEST);
+        }
+    }
 
 }

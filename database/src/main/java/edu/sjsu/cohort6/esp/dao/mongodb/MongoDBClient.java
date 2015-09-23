@@ -17,6 +17,7 @@ package edu.sjsu.cohort6.esp.dao.mongodb;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.mongodb.MongoClient;
+import edu.sjsu.cohort6.esp.common.CommonUtils;
 import edu.sjsu.cohort6.esp.common.Course;
 import edu.sjsu.cohort6.esp.common.Student;
 import edu.sjsu.cohort6.esp.dao.DBClient;
@@ -176,6 +177,7 @@ public class MongoDBClient implements DBClient {
         if (studentIdsList != null) {
             for (String id : studentIdsList) {
                 if (id != null) {
+                    id = CommonUtils.sanitizeIdString(id);
                     objectIds.add(new ObjectId(id));
                 }
             }
@@ -186,6 +188,7 @@ public class MongoDBClient implements DBClient {
         QueryResults<Student> results = studentDAO.find(query);
         return results.asList();
     }
+
 
     @Override
     public List<String> addCourse(List<Course> courseList) {

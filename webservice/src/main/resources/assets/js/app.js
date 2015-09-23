@@ -6,7 +6,7 @@
     var store = this;
     store.students = [];
 
-    $http.get("/api/students").success(function(data) {
+    $http.get("/api/v1.0/students").success(function(data) {
         store.students = data;
     });
   }]);
