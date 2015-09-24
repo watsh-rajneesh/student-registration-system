@@ -14,7 +14,10 @@
 
 package edu.sjsu.cohort6.esp.dao.mongodb;
 
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.util.JSON;
 import edu.sjsu.cohort6.esp.common.CommonUtils;
 import edu.sjsu.cohort6.esp.common.Student;
 import edu.sjsu.cohort6.esp.dao.BaseDAO;
@@ -38,9 +41,11 @@ import java.util.List;
  * @author rwatsh
  */
 public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Student> {
+    private Morphia morphia;
 
     protected StudentDAO(MongoClient mongoClient, Morphia morphia, String dbName) {
         super(mongoClient, morphia, dbName);
+        this.morphia = morphia;
     }
 
     /**
@@ -85,7 +90,7 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
     }
 
     @Override
-    public List<Student> fetch(List<String> studentIdsList) {
+    public List<Student> fetchById(List<String> studentIdsList) {
         List<ObjectId> objectIds = new ArrayList<>();
         Query<Student> query =  null;
 
@@ -102,6 +107,26 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
                 : this.createQuery();
         QueryResults<Student> results = this.find(query);
         return results.asList();
+    }
+
+    @Override
+    public List<Student> fetch(String query) {
+        List<Student> students = new ArrayList<>();
+        DBObject dbObjQuery;
+        DBCursor cursor;
+        if (!(query == null)) {
+            dbObjQuery = (DBObject) JSON.parse(query);
+            cursor = this.getCollection().find(dbObjQuery);
+        } else {
+            cursor = this.getCollection().find();
+        }
+
+        List<DBObject> dbObjects = cursor.toArray();
+        for (DBObject dbObject: dbObjects) {
+            Student student = morphia.fromDBObject(Student.class, dbObject);
+            students.add(student);
+        }
+        return students;
     }
 
 

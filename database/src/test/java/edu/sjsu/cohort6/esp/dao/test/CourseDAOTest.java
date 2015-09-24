@@ -17,9 +17,7 @@ package edu.sjsu.cohort6.esp.dao.test;
 import edu.sjsu.cohort6.esp.common.Course;
 import edu.sjsu.cohort6.esp.dao.mongodb.CourseDAO;
 import org.testng.Assert;
-import org.testng.annotations.Test;
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,43 +26,43 @@ import java.util.logging.Logger;
  *
  * @author rwatsh on 9/24/15.
  */
-public class CourseDAOTest extends DBTest<CourseDAO> {
+public class CourseDAOTest extends DBTest<CourseDAO, Course> {
     private static final Logger log = Logger.getLogger(CourseDAOTest.class.getName());
 
-    @Test
-    public void testAddCourse() throws ParseException {
+    @Override
+    public void testAdd(List<Course> entityList) throws Exception {
         testCreateCourse();
     }
 
-    @Test
-    public void testRemoveCourses() throws Exception {
+    @Override
+    public void testRemove() throws Exception {
         List<String> insertedIds = testCreateCourse();
         Assert.assertNotNull(insertedIds);
         long countRemovedEntries = dao.remove(insertedIds);
         Assert.assertTrue(countRemovedEntries > 0, "Failed to delete any course");
     }
 
-    @Test
-    public void testUpdateCourses() throws Exception {
+    @Override
+    public void testUpdate() throws Exception {
         List<String> insertedIds = testCreateCourse();
         Assert.assertNotNull(insertedIds);
-        List<Course> courses = dao.fetch(insertedIds);
+        List<Course> courses = dao.fetchById(insertedIds);
         Assert.assertNotNull(courses);
         for (Course c : courses) {
             c.setAvailabilityStatus(Course.AvailabilityStatus.UNAVAILABLE.getValue());
         }
         log.info("Course modified: " + courses);
         dao.update(courses);
-        courses = dao.fetch(insertedIds);
+        courses = dao.fetchById(insertedIds);
         Assert.assertNotNull(courses);
         log.info("Course updated in DB: " + courses);
     }
 
-    @Test
-    public void testFetchCourses() throws Exception {
+    @Override
+    public void testFetch() throws Exception {
         List<String> insertedIds = testCreateCourse();
         Assert.assertNotNull(insertedIds);
-        List<Course> courses = dao.fetch(insertedIds);
+        List<Course> courses = dao.fetchById(insertedIds);
         Assert.assertNotNull(courses);
     }
 }

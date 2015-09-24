@@ -25,10 +25,7 @@ import edu.sjsu.cohort6.esp.dao.DatabaseModule;
 import edu.sjsu.cohort6.esp.dao.mongodb.CourseDAO;
 import edu.sjsu.cohort6.esp.dao.mongodb.UserDAO;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.*;
 
 import java.lang.reflect.ParameterizedType;
 import java.text.MessageFormat;
@@ -43,7 +40,7 @@ import java.util.logging.Logger;
  *
  * @author rwatsh on 9/24/15.
  */
-public abstract class DBTest<T extends BaseDAO> {
+public abstract class DBTest<T extends BaseDAO, S> {
     @Inject
     private DBFactory dbFactory;
     protected T dao;
@@ -58,6 +55,9 @@ public abstract class DBTest<T extends BaseDAO> {
         Module module = new DatabaseModule();
         Guice.createInjector(module).injectMembers(this);
         client = dbFactory.create("localhost", 27017, TESTREG);
+        /*
+         * Use reflection to infer the class for T type.
+         */
         this.tClass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0];
         dao = (T) client.getDAO(tClass);
@@ -90,6 +90,26 @@ public abstract class DBTest<T extends BaseDAO> {
         log.info(MessageFormat.format("********* Time taken: {0} ms", diff));
     }
 
+    /*
+     * Abstract test methods to be implemented by concrete test classes.
+     */
+    @Test
+    abstract public void testAdd(List<S> entityList) throws Exception;
+
+    @Test
+    abstract public void testRemove() throws Exception;
+
+    @Test
+    abstract public void testUpdate() throws Exception;
+
+    @Test
+    abstract public void testFetch() throws Exception;
+
+    /**
+     * Common test methods shared across test sub classes.
+     */
+
+
     protected User testCreateUser() {
         User user = new User("watsh.rajneesh@sjsu.edu", "watsh.rajneesh@sjsu.edu", "Watsh", "Rajneesh", new Role(RoleType.STUDENT));
         UserDAO userDAO = (UserDAO)client.getDAO(UserDAO.class);
@@ -97,7 +117,7 @@ public abstract class DBTest<T extends BaseDAO> {
         usersList.add(user);
         List<String> insertedIds = userDAO.add(usersList);
         log.info("User: " + user);
-        List<User> users = userDAO.fetch(insertedIds);
+        List<User> users = userDAO.fetchById(insertedIds);
         Assert.assertNotNull(users);
         log.info("User created: " + users);
         return users.get(0);
@@ -136,7 +156,7 @@ public abstract class DBTest<T extends BaseDAO> {
             add(course);
         }});
 
-        List<Course> courses = courseDAO.fetch(insertedIds);
+        List<Course> courses = courseDAO.fetchById(insertedIds);
         Assert.assertNotNull(courses);
         log.info("Course created: " + courses);
         return insertedIds;

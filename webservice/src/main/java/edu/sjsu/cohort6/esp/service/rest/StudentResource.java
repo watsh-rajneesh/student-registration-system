@@ -61,14 +61,14 @@ public class StudentResource extends BaseResource<Student> {
     @Override
     public List list(@Auth User user) {
         List<String> studentIds = new ArrayList<>();
-        List<Student> studentList = studentDAO.fetch(studentIds);
+        List<Student> studentList = studentDAO.fetchById(studentIds);
         return studentList;
     }
 
     @Override
     public Student retrieve(@Auth User user, @PathParam("id") String studentId) throws ResourceNotFoundException {
         List<String> studentIds = getStudentIdsList(studentId);
-        List<Student> studentList = studentDAO.fetch(studentIds);
+        List<Student> studentList = studentDAO.fetchById(studentIds);
         if (studentList != null && !studentList.isEmpty()) {
             return studentList.get(0);
         } else {
@@ -103,7 +103,7 @@ public class StudentResource extends BaseResource<Student> {
         student.set_id(new ObjectId(id));
         try {
             studentDAO.update(getStudentsList(student));
-            List<Student> studentList = studentDAO.fetch(getStudentIdsList(id));
+            List<Student> studentList = studentDAO.fetchById(getStudentIdsList(id));
             if (studentList != null && !studentList.isEmpty()) {
                 return studentList.get(0);
             }

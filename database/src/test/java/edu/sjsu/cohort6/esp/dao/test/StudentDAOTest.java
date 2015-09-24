@@ -30,47 +30,67 @@ import java.util.logging.Logger;
  *
  * @author rwatsh on 9/24/15.
  */
-public class StudentDAOTest extends DBTest<StudentDAO> {
+public class StudentDAOTest extends DBTest<StudentDAO, Student> {
     private final static Logger log = Logger.getLogger(DBTest.class.getName());
 
-    @Test
-    public void testAddStudents() {
-        testCreateStudents();
-    }
 
-    private List<String> testCreateStudents() {
+    private List<String> testCreateStudents()  {
         Student s = new Student(testCreateUser());
         List<Student> studentList = new ArrayList<>();
         studentList.add(s);
         List<String> insertedIds = dao.add(studentList);
-        List<Student> students = dao.fetch(insertedIds);
+        List<Student> students = dao.fetchById(insertedIds);
         Assert.assertNotNull(students);
         log.info("Student created: " + students);
         return insertedIds;
     }
 
-    @Test
-    public void testRemoveStudents() throws Exception {
+    @Override
+    public void testAdd(List<Student> entityList) {
+        testCreateStudents();
+    }
+
+    @Override
+    public void testRemove() throws Exception {
         List<String> insertedIds = testCreateStudents();
         Assert.assertNotNull(insertedIds);
         long countRemovedEntries = dao.remove(insertedIds);
         Assert.assertTrue(countRemovedEntries > 0, "Failed to delete any student");
     }
 
-    @Test
-    public void testUpdateStudents() throws Exception {
+    @Override
+    public void testUpdate() throws Exception {
         List<String> insertedIds = testCreateStudents();
         Assert.assertNotNull(insertedIds);
-        List<Student> students = dao.fetch(insertedIds);
+        List<Student> students = dao.fetchById(insertedIds);
         Assert.assertNotNull(students);
         for (Student s : students) {
             s.getUser().setLastName("test");
         }
         log.info("Student's user modified: " + students);
         dao.update(students);
-        students = dao.fetch(insertedIds);
+        students = dao.fetchById(insertedIds);
         Assert.assertNotNull(students);
         log.info("Student updated in DB: " + students);
+    }
+
+
+
+    @Override
+    public void testFetch() throws Exception {
+        List<String> insertedIds = testCreateStudents();
+        Assert.assertNotNull(insertedIds);
+        List<Student> students = dao.fetchById(insertedIds);
+        Assert.assertNotNull(students);
+    }
+
+    // Additional student specific test methods.
+
+    @Test
+    public void testFetchStudentsNull() {
+        testCreateStudents();
+        List<Student> students = dao.fetchById(null);
+        Assert.assertNotNull(students);
     }
 
     @Test
@@ -79,8 +99,8 @@ public class StudentDAOTest extends DBTest<StudentDAO> {
         List<String> courseIds = testCreateCourse();
         Assert.assertNotNull(insertedIds);
         Assert.assertNotNull(courseIds);
-        List<Student> students = dao.fetch(insertedIds);
-        List<Course> courses = ((CourseDAO)client.getDAO(CourseDAO.class)).fetch(courseIds);
+        List<Student> students = dao.fetchById(insertedIds);
+        List<Course> courses = ((CourseDAO)client.getDAO(CourseDAO.class)).fetchById(courseIds);
         Assert.assertNotNull(students);
         Assert.assertNotNull(courses);
         for (Student s : students) {
@@ -88,24 +108,10 @@ public class StudentDAOTest extends DBTest<StudentDAO> {
         }
         log.info("Student modified: " + students);
         dao.update(students);
-        students = dao.fetch(insertedIds);
+        students = dao.fetchById(insertedIds);
         Assert.assertNotNull(students);
         Assert.assertTrue(!students.get(0).getCourseRefs().isEmpty());
         log.info("Student updated in DB: " + students);
     }
 
-    @Test
-    public void testFetchStudents() throws Exception {
-        List<String> insertedIds = testCreateStudents();
-        Assert.assertNotNull(insertedIds);
-        List<Student> students = dao.fetch(insertedIds);
-        Assert.assertNotNull(students);
-    }
-
-    @Test
-    public void testFetchStudentsNull() {
-        testCreateStudents();
-        List<Student> students = dao.fetch(null);
-        Assert.assertNotNull(students);
-    }
 }

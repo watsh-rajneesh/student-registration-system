@@ -25,5 +25,6 @@ public interface BaseDAO<T> {
     List<String> add(List<T> entityList);
     long remove(List<String> entityIdsList);
     void update(List<T> entityList);
-    List<T> fetch(List<String> entityIdsList);
+    List<T> fetchById(List<String> entityIdsList);
+    List<T> fetch(String jsonQueryString);
 }
