@@ -28,6 +28,20 @@ import java.util.Date;
  * User documents are referenced by Student documents.
  * User documents will have embedded role info (whether user is admin or student).
  *
+ "{
+     _id" : ObjectId("5603cf1ed3fde88bbc371ffd"),
+     "className" : "edu.sjsu.cohort6.esp.common.User",
+     "emailId" : "watsh.rajneesh@sjsu.edu",
+     "userName" : "watsh.rajneesh@sjsu.edu",
+     "token" : "3cc28509-350a-4e70-8f79-28798199f37b",
+     "firstName" : "Watsh",
+     "lastName" : "Rajneesh",
+     "role" : {
+        "role" : "STUDENT"
+     },
+     "lastUpdated" : ISODate("2015-09-24T10:23:26.095Z")
+ }
+ *
  * @author rwatsh on 9/23/15.
  */
 @Entity("user")

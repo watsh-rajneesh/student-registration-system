@@ -36,14 +36,10 @@ import java.util.logging.Logger;
  * This POJO will be used across DB, Web service and UI.
  *
  * {
-     "_id" : ObjectId("55f6f9fcd3fde80ee829ef4c"),
+     "_id" : ObjectId("5603cf1ed3fde88bbc372003"),
      "className" : "edu.sjsu.cohort6.esp.common.Student",
-     "firstName" : "Watsh",
-     "lastName" : "test",
-     "emailId" : "watsh.rajneesh@sjsu.edu",
-     "passwordHash" : "5f4dcc3b5aa765d61d8327deb882cf99",
-     "lastUpdated" : ISODate("2015-09-14T16:46:52.352Z"),
-     "courseRefs" : [ ]
+     "user" : DBRef("user", ObjectId("5603cf1ed3fde88bbc372002")),
+     "lastUpdated" : ISODate("2015-09-24T10:23:26.128Z")
  }
  *
  * @author rwatsh

@@ -27,16 +27,16 @@ import java.util.logging.Logger;
  * Course entity.
  *  db.course.find().pretty()
  {
-     "_id" : ObjectId("55f6f4c0d3fde80d8c2592e0"),
-     "className" : "Course",
+     "_id" : ObjectId("5603cf1ed3fde88bbc371fff"),
+     "className" : "edu.sjsu.cohort6.esp.common.Course",
      "courseName" : "Cloud Technologies",
      "instructors" : [
          "Ahmad Nouri",
          "Thomas Hildebrand",
          "Aktouf"
      ],
-     "startTime" : ISODate("2015-10-10T07:00:00Z"),
-     "endTime" : ISODate("2015-11-10T08:00:00Z"),
+     "startTime" : ISODate("2015-10-10T17:30:00Z"),
+     "endTime" : ISODate("2015-11-10T21:00:00Z"),
      "availabilityStatus" : 1,
      "maxCapacity" : 20,
      "price" : 200,
@@ -46,7 +46,7 @@ import java.util.logging.Logger;
          "MongoDB",
          "REST"
      ],
-     "lastUpdated" : ISODate("2015-09-14T16:24:32.877Z")
+     "lastUpdated" : ISODate("2015-09-24T10:23:26.102Z")
  }
  *
  * @author rwatsh
