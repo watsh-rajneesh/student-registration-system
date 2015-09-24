@@ -17,7 +17,12 @@ package edu.sjsu.cohort6.esp.dao.test;
 import edu.sjsu.cohort6.esp.common.Course;
 import edu.sjsu.cohort6.esp.dao.mongodb.CourseDAO;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
+import java.lang.reflect.Method;
+import java.text.MessageFormat;
+import java.text.ParseException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -64,5 +69,25 @@ public class CourseDAOTest extends DBTest<CourseDAO, Course> {
         Assert.assertNotNull(insertedIds);
         List<Course> courses = dao.fetchById(insertedIds);
         Assert.assertNotNull(courses);
+    }
+
+    // Additional course specific tests.
+
+    @DataProvider(name = "dp")
+    public Object[][] createData(Method m) {
+        System.out.println(m.getName());  // print test method name
+            return new Object[][]{
+                    {"{ price: { $gte: 100}}", 1},
+                    {"{ price: { $gte: 100}, keywords: \"REST\", keywords: \"Java\" }", 1},
+                    {"{ price: { $gte: 100}, keywords: \"REST\", keywords: \"Java1\" }", 0}
+            };
+
+        }
+    @Test(dataProvider = "dp")
+    public void testFetchParametrized(String query, int expectedCount) throws ParseException {
+        testCreateCourse();
+        List<Course> courses = dao.fetch(query);
+        Assert.assertTrue(courses.size() >= expectedCount,
+                MessageFormat.format("Test failed for query: {0}, found records [{1}], expected count {2}", query, courses.size(), expectedCount));
     }
 }
