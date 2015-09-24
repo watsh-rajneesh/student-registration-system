@@ -23,10 +23,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -106,10 +103,11 @@ public class StudentResourceTest {
     }
 
     private Student createStudent() throws Exception {
-        Student s = new Student("Watsh", "Rajneesh", "watsh.rajneesh@sjsu.edu", "password");
-        Response response = webTarget.path(STUDENT_RESOURCE_URI)
-                .request()
-                .post(Entity.entity(s, MediaType.APPLICATION_JSON));
+        Student s = new Student();
+        Invocation.Builder invocationBuilder = webTarget.path(STUDENT_RESOURCE_URI)
+                .request().accept(MediaType.APPLICATION_JSON_TYPE);
+
+        Response response = invocationBuilder.post(Entity.entity(s, MediaType.APPLICATION_JSON_TYPE));
 
         log.info(response.toString());
         s = response.readEntity(Student.class);

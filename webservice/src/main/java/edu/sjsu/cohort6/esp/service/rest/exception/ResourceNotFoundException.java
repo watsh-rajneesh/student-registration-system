@@ -12,21 +12,21 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.esp.dao;
-
+package edu.sjsu.cohort6.esp.service.rest.exception;
 
 /**
- * A generic DB Client interface.
- *
- * @author rwatsh
+ * @author rwatsh on 9/23/15.
  */
-public interface DBClient extends AutoCloseable {
-    // Common operations which don't belong in entities.
-    void dropDB(String dbName);
-    void useDB(String dbName);
-    boolean checkHealth();
-    String getConnectString();
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
-    // Gets the entity DAO instance.
-    Object getDAO(Class<? extends BaseDAO> clazz);
+public class ResourceNotFoundException extends WebApplicationException {
+
+    public ResourceNotFoundException() {
+        super(Response.Status.NOT_FOUND);
+    }
+
+    public ResourceNotFoundException(Throwable throwable) {
+        super(Response.Status.NOT_FOUND.toString(), throwable);
+    }
 }

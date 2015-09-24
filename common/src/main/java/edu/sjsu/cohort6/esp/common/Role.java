@@ -12,21 +12,32 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.esp.dao;
+package edu.sjsu.cohort6.esp.common;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.mongodb.morphia.annotations.Embedded;
 
 /**
- * A generic DB Client interface.
+ * Role embedded document which will not have any id and will be created embedded within a user document.
  *
- * @author rwatsh
+ * @author rwatsh on 9/24/15.
  */
-public interface DBClient extends AutoCloseable {
-    // Common operations which don't belong in entities.
-    void dropDB(String dbName);
-    void useDB(String dbName);
-    boolean checkHealth();
-    String getConnectString();
+@Embedded
+public class Role {
+    private RoleType role;
 
-    // Gets the entity DAO instance.
-    Object getDAO(Class<? extends BaseDAO> clazz);
+    public Role() {}
+
+    public Role(RoleType role) {
+        this.role = role;
+    }
+
+    @JsonProperty
+    public RoleType getRole() {
+        return role;
+    }
+
+    public void setRole(RoleType role) {
+        this.role = role;
+    }
 }

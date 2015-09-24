@@ -14,66 +14,112 @@
 
 package edu.sjsu.cohort6.esp.service.rest;
 
-import com.google.common.base.Optional;
 import edu.sjsu.cohort6.esp.common.Student;
+import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
+import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
+import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
+import io.dropwizard.auth.Auth;
+import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 /**
  * Created by rwatsh on 9/15/15.
  */
 @Path(EndpointUtils.ENDPOINT_ROOT + "/students")
 @Produces(MediaType.APPLICATION_JSON)
-public class StudentResource {
-    private DBClient dbClient;
+public class StudentResource extends BaseResource<Student> {
+
 
     public StudentResource(DBClient client) {
-        this.dbClient = client;
+        super(client);
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Student> fetch(@QueryParam("id") Optional<String> studentId) {
-        List<String> studentIds = new ArrayList<>();
-        if (studentId != null && !studentId.equals(Optional.<String>absent())) {
-            studentIds.add(studentId.get());
-        } else {
-            studentIds = null;
-        }
-        List<Student> studentList = dbClient.fetchStudents(studentIds);
-        if (studentList != null) {
-            return studentList;
-            //return Response.ok(studentList).build();
-        } else {
-            throw new WebApplicationException(NOT_FOUND);
-        }
-    }
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createStudent(@Valid Student student) throws Exception {
+    @Override
+    public Response create(@Auth User user, @Valid Student student, @Context UriInfo info) {
         try {
             List<Student> studentList = new ArrayList<>();
             studentList.add(student);
-            List<String> studentIds = dbClient.addStudents(studentList);
+            List<String> studentIds = studentDAO.add(studentList);
             return Response.created(UriBuilder.fromResource(getClass())
                     .build(student, studentIds.get(0)))
                     .build();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new WebApplicationException(BAD_REQUEST);
+            throw new edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException();
         }
     }
 
+    @Override
+    public List list(@Auth User user) {
+        List<String> studentIds = new ArrayList<>();
+        List<Student> studentList = studentDAO.fetch(studentIds);
+        return studentList;
+    }
+
+    @Override
+    public Student retrieve(@Auth User user, @PathParam("id") String studentId) throws ResourceNotFoundException {
+        List<String> studentIds = getStudentIdsList(studentId);
+        List<Student> studentList = studentDAO.fetch(studentIds);
+        if (studentList != null && !studentList.isEmpty()) {
+            return studentList.get(0);
+        } else {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    private List<String> getStudentIdsList(String studentId) {
+        List<String> studentIds = new ArrayList<>();
+
+        if (studentId != null && !studentId.isEmpty()) {
+            studentIds.add(studentId);
+        } else {
+            studentIds = null;
+        }
+        return studentIds;
+    }
+
+    private List<Student> getStudentsList(Student student) {
+        List<Student> students = new ArrayList<>();
+
+        if (student != null) {
+            students.add(student);
+        } else {
+            students = null;
+        }
+        return students;
+    }
+
+    @Override
+    public Student update(@Auth User user, @PathParam("id") String id, @Valid Student student) throws ResourceNotFoundException {
+        student.set_id(new ObjectId(id));
+        try {
+            studentDAO.update(getStudentsList(student));
+            List<Student> studentList = studentDAO.fetch(getStudentIdsList(id));
+            if (studentList != null && !studentList.isEmpty()) {
+                return studentList.get(0);
+            }
+            throw new ResourceNotFoundException();
+        } catch (Exception e) {
+            throw new InternalErrorException(e);
+        }
+    }
+
+    @Override
+    public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException {
+        try {
+            studentDAO.remove(getStudentIdsList(id));
+            return Response.ok().build();
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
+    }
 }

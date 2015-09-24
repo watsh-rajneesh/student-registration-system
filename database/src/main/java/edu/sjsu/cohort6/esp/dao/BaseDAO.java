@@ -14,19 +14,16 @@
 
 package edu.sjsu.cohort6.esp.dao;
 
+import java.util.List;
 
 /**
- * A generic DB Client interface.
+ * Generic DAO interface for basic CRUD operations on entity T.
  *
- * @author rwatsh
+ * @author rwatsh on 9/24/15.
  */
-public interface DBClient extends AutoCloseable {
-    // Common operations which don't belong in entities.
-    void dropDB(String dbName);
-    void useDB(String dbName);
-    boolean checkHealth();
-    String getConnectString();
-
-    // Gets the entity DAO instance.
-    Object getDAO(Class<? extends BaseDAO> clazz);
+public interface BaseDAO<T> {
+    List<String> add(List<T> entityList);
+    long remove(List<String> entityIdsList);
+    void update(List<T> entityList);
+    List<T> fetch(List<String> entityIdsList);
 }

@@ -45,6 +45,11 @@
             <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-auth</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
             <groupId>edu.sjsu.cohort6.esp</groupId>
             <artifactId>database</artifactId>
             <version>${project.version}</version>

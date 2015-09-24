@@ -14,9 +14,10 @@
 
 package edu.sjsu.cohort6.esp.dao.mongodb;
 
+import com.google.common.base.Optional;
 import com.mongodb.MongoClient;
 import edu.sjsu.cohort6.esp.common.CommonUtils;
-import edu.sjsu.cohort6.esp.common.Student;
+import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.BaseDAO;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Key;
@@ -31,31 +32,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Student DAO.
+ * User DAO.
  *
- * Implements BaseDAO methods for the student entity.
+ * Implements BaseDAO methods for the User entity.
  *
- * @author rwatsh
+ * @author rwatsh on 9/24/15.
  */
-public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Student> {
+public class UserDAO extends BasicDAO<User, String> implements BaseDAO<User> {
 
-    protected StudentDAO(MongoClient mongoClient, Morphia morphia, String dbName) {
+    protected UserDAO(MongoClient mongoClient, Morphia morphia, String dbName) {
         super(mongoClient, morphia, dbName);
     }
 
-    /**
-     * Add a list of students to DB.
-     *
-     * @param entityList
-     * @return
-     */
     @Override
-    public List<String> add(List<Student> entityList) {
+    public List<String> add(List<User> entityList) {
         List<String> insertedIds = new ArrayList<>();
 
         if (entityList != null) {
-            for (Student student: entityList) {
-                Key<Student> key = this.save(student);
+            for (User user: entityList) {
+                Key<User> key = this.save(user);
                 insertedIds.add(key.getId().toString());
             }
         }
@@ -68,29 +63,31 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
         for (String id : entityIdsList) {
             objectIds.add(new ObjectId(id));
         }
-        Query<Student> query = this.createQuery().field(Mapper.ID_KEY).in(objectIds);
+        Query<User> query = this.createQuery().field(Mapper.ID_KEY).in(objectIds);
         return this.deleteByQuery(query).getN();
     }
 
     @Override
-    public void update(List<Student> studentList) {
-        for (Student s : studentList) {
-            UpdateOperations<Student> ops = this.createUpdateOperations()
-                    .set("courseRefs", s.getCourseRefs())
-                    .set("user", s.getUser());
+    public void update(List<User> entityList) {
+        for (User u : entityList) {
+            UpdateOperations<User> ops = this.createUpdateOperations()
+                    .set("emailId", u.getEmailId())
+                    .set("lastName", u.getLastName())
+                    .set("firstName", u.getFirstName())
+                    .set("userName", u.getUserName());
 
-            Query<Student> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(s.get_id());
+            Query<User> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(u.get_id());
             this.update(updateQuery, ops);
         }
     }
 
     @Override
-    public List<Student> fetch(List<String> studentIdsList) {
+    public List<User> fetch(List<String> entityIdsList) {
         List<ObjectId> objectIds = new ArrayList<>();
-        Query<Student> query =  null;
+        Query<User> query =  null;
 
-        if (studentIdsList != null) {
-            for (String id : studentIdsList) {
+        if (entityIdsList != null) {
+            for (String id : entityIdsList) {
                 if (id != null) {
                     id = CommonUtils.sanitizeIdString(id);
                     objectIds.add(new ObjectId(id));
@@ -100,22 +97,20 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
         query = objectIds != null && !objectIds.isEmpty()
                 ? this.createQuery().field(Mapper.ID_KEY).in(objectIds)
                 : this.createQuery();
-        QueryResults<Student> results = this.find(query);
+        QueryResults<User> results = this.find(query);
         return results.asList();
     }
 
-
-
-    /*@Override
-    public void updateStudents(List<Student> studentList, List<Course> courseList) {
-        UpdateOperations<Student> ops = studentDAO.createUpdateOperations()
-                .set("courseRefs", courseList);
-        List<ObjectId> objectIds = new ArrayList<>();
-        for (Student s : studentList) {
-            objectIds.add(s.get_id());
-        }
-        Query<Student> query = studentDAO.createQuery().field(Mapper.ID_KEY).in(objectIds);
-        studentDAO.update(query, ops);
-    }*/
-
+    /**
+     * This method is required for basic authentication upon every API call.
+     *
+     * @param username
+     * @param password
+     * @return
+     */
+    public Optional<User> getUserByCredentials(String username, String password) {
+        Query<User> query =  this.createQuery().field("userName").equal(username).field("token").equal(password);
+        QueryResults<User> results = this.find(query);
+        return Optional.of(results.get());
+    }
 }

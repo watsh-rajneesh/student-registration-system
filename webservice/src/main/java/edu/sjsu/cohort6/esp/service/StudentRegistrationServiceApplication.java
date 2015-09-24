@@ -15,15 +15,23 @@
 package edu.sjsu.cohort6.esp.service;
 
 import com.google.inject.Inject;
+import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.dao.DBFactory;
+import edu.sjsu.cohort6.esp.service.auth.SimpleAuthenticator;
 import edu.sjsu.cohort6.esp.service.health.DBHealthCheck;
 import edu.sjsu.cohort6.esp.service.rest.EndpointUtils;
 import edu.sjsu.cohort6.esp.service.rest.StudentResource;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.auth.AuthFactory;
+import io.dropwizard.auth.Authenticator;
+import io.dropwizard.auth.basic.BasicAuthFactory;
+import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+
+
 /**
  * Created by rwatsh on 9/14/15.
  */
@@ -51,9 +59,15 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
          */
         bootstrap.addBundle(new AssetsBundle("/assets", "/esp", "index.html"));
     }
+
     @Override
     public void run(StudentRegistrationServiceConfiguration studentRegistrationServiceConfiguration, Environment environment) throws Exception {
         client = studentRegistrationServiceConfiguration.getDbConfig().build(environment);
+        Authenticator<BasicCredentials, User> simpleAuthenticator = new SimpleAuthenticator(client);
+        environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<User>(simpleAuthenticator,
+                "studentreg",
+                User.class)));
+
         environment.healthChecks().register("database", new DBHealthCheck(client));
         final StudentResource studentResource = new StudentResource(client);
         environment.jersey().setUrlPattern(EndpointUtils.ENDPOINT_ROOT + "/*");

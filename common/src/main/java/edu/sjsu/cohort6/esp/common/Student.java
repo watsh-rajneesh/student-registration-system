@@ -14,20 +14,23 @@
 
 package edu.sjsu.cohort6.esp.common;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Student entity.
+ *
+ * Student document will have a user entity reference.
+ * Student document may have one or more course references.
  *
  * Some annotations are per morphia and some per dropwizard frameworks.
  * This POJO will be used across DB, Web service and UI.
@@ -49,17 +52,15 @@ import java.util.List;
 @Indexes(
         @Index(value = "emailId", fields = @Field("emailId"))
 )
-@JsonIgnoreProperties({"_id", "code", "message"})
-public class Student {
+@JsonIgnoreProperties({"_id"})
+
+public class Student extends BaseModel {
     @Id
     private ObjectId _id;
     @Transient
     private String id;
-    private String firstName;
-    private String lastName;
-    @Indexed(name="emailId", unique=true,dropDups=true)
-    private String emailId;
-    private String passwordHash;
+    @Reference
+    private User user;
     @Reference
     private List<Course> courseRefs;
 
@@ -67,34 +68,14 @@ public class Student {
 
     @PrePersist void prePersist() {lastUpdated = new Date();}
 
-    public Student(String firstName, String lastName, String emailId, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.emailId = emailId;
-        try {
-            this.passwordHash = generateMD5Hash(password);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to generate password hash");
-        }
+    private static final Logger log = Logger.getLogger(Student.class.getName());
+
+    public Student(User user) {
+        this.user = user;
         this.courseRefs = new ArrayList<>();
     }
 
     public Student() {}
-
-    private String generateMD5Hash(String plaintext) throws NoSuchAlgorithmException {
-        MessageDigest m = MessageDigest.getInstance("MD5");
-        m.reset();
-        m.update(plaintext.getBytes());
-        byte[] digest = m.digest();
-        BigInteger bigInt = new BigInteger(1, digest);
-        String hashtext = bigInt.toString(16);
-        // Now we need to zero pad it if you actually want the full 32 chars.
-        while (hashtext.length() < 32) {
-            hashtext = "0" + hashtext;
-        }
-        return hashtext;
-    }
 
     public ObjectId get_id() {
         return _id;
@@ -123,41 +104,6 @@ public class Student {
         this.lastUpdated = lastUpdated;
     }
 
-    @JsonProperty
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    @JsonProperty
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    @JsonProperty
-    public String getEmailId() {
-        return emailId;
-    }
-
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
-    }
-
-    @JsonProperty
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
 
     @JsonProperty
     public List<Course> getCourseRefs() {
@@ -168,15 +114,31 @@ public class Student {
         this.courseRefs = courseRefs;
     }
 
+    // note: name does not matter; never auto-detected, need to annotate
+    // (also note that formal argument type #1 must be "String"; second one is usually
+    //  "Object", but can be something else -- as long as JSON can be bound to that type)
+
+    @JsonAnySetter
+    public void handleUnknown(String key, Object value) {
+        log.warning(MessageFormat.format("Unknown property key {0} value {1}", key, value));
+    }
+
+    @JsonProperty
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "Student{" +
                 "id=" + (_id != null ?_id.toHexString() : _id) +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", emailId='" + emailId + '\'' +
-                ", passwordHash='" + passwordHash + '\'' +
+                ", user=" + user +
                 ", courseRefs=" + courseRefs +
+                ", lastUpdated=" + lastUpdated +
                 '}';
     }
 }

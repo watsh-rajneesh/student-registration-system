@@ -12,21 +12,13 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.esp.dao;
-
+package edu.sjsu.cohort6.esp.common;
 
 /**
- * A generic DB Client interface.
+ * Types of roles a user can have.
  *
- * @author rwatsh
+ * @author rwatsh on 9/24/15.
  */
-public interface DBClient extends AutoCloseable {
-    // Common operations which don't belong in entities.
-    void dropDB(String dbName);
-    void useDB(String dbName);
-    boolean checkHealth();
-    String getConnectString();
-
-    // Gets the entity DAO instance.
-    Object getDAO(Class<? extends BaseDAO> clazz);
+public enum RoleType {
+    ADMIN, STUDENT;
 }

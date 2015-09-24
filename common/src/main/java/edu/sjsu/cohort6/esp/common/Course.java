@@ -21,6 +21,7 @@ import org.mongodb.morphia.annotations.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Course entity.
@@ -55,7 +56,7 @@ import java.util.List;
         @Index(value = "courseName", fields = @Field("courseName"))
 )
 @JsonIgnoreProperties({"_id"})
-public class Course {
+public class Course extends BaseModel {
     @Id
     private ObjectId _id;
     @Transient
@@ -75,6 +76,8 @@ public class Course {
     private List<Student> studentRefs;*/
 
     Date lastUpdated = new Date();
+
+    private static final Logger log = Logger.getLogger(Course.class.getName());
 
     @PrePersist void prePersist() {lastUpdated = new Date();}
 
@@ -300,4 +303,6 @@ public class Course {
             return value;
         }
     }
+
+
 }

@@ -16,14 +16,80 @@ package edu.sjsu.cohort6.esp.dao.mongodb;
 
 import com.mongodb.MongoClient;
 import edu.sjsu.cohort6.esp.common.Course;
+import edu.sjsu.cohort6.esp.dao.BaseDAO;
+import org.bson.types.ObjectId;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.dao.BasicDAO;
+import org.mongodb.morphia.mapping.Mapper;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.QueryResults;
+import org.mongodb.morphia.query.UpdateOperations;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by rwatsh on 9/13/15.
+ * Course DAO.
+ *
+ * Implements BaseDAO methods for the Couse entity.
+ *
+ * @author rwatsh
  */
-public class CourseDAO extends BasicDAO<Course, String> {
+public class CourseDAO extends BasicDAO<Course, String> implements BaseDAO<Course> {
     protected CourseDAO(MongoClient mongoClient, Morphia morphia, String dbName) {
         super(mongoClient, morphia, dbName);
+    }
+
+    @Override
+    public List<String> add(List<Course> courseList) {
+        //morphiaDatastore.save(courseList);
+        List<String> insertedIds = new ArrayList<>();
+        for (Course course: courseList) {
+            insertedIds.add(((ObjectId) this.save(course).getId()).toString());
+        }
+        return insertedIds;
+    }
+
+    @Override
+    public long remove(List<String> courseIdsList) {
+        List<ObjectId> objectIds = new ArrayList<>();
+        for (String id : courseIdsList) {
+            objectIds.add(new ObjectId(id));
+        }
+        Query<Course> query = this.createQuery().field(Mapper.ID_KEY).in(objectIds);
+        return this.deleteByQuery(query).getN();
+    }
+
+    @Override
+    public void update(List<Course> courseList) {
+        for (Course course : courseList) {
+            UpdateOperations<Course> ops = this.createUpdateOperations()
+                    .set("courseName", course.getCourseName())
+                    .set("availabilityStatus", course.getAvailabilityStatus())
+                            //.set("endDate", course.getEndDate())
+                    .set("endTime", course.getEndTime())
+                    .set("instructors", course.getInstructors())
+                    .set("keywords", course.getKeywords())
+                    .set("location", course.getLocation())
+                    .set("maxCapacity", course.getMaxCapacity())
+                    .set("price", course.getPrice())
+                            //.set("startDate", course.getStartDate())
+                    .set("startTime", course.getStartTime());
+
+            Query<Course> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(course.get_id());
+            this.update(updateQuery, ops);
+        }
+    }
+
+    @Override
+    public List<Course> fetch(List<String> courseIdsList) {
+        List<ObjectId> objectIds = new ArrayList<>();
+        for (String id : courseIdsList) {
+            objectIds.add(new ObjectId(id));
+        }
+
+        Query<Course> query = this.createQuery().field(Mapper.ID_KEY).in(objectIds);
+        QueryResults<Course> results = this.find(query);
+        return results.asList();
     }
 }
