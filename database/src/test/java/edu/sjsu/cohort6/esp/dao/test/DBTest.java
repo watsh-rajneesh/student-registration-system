@@ -94,7 +94,7 @@ public abstract class DBTest<T extends BaseDAO, S> {
      * Abstract test methods to be implemented by concrete test classes.
      */
     @Test
-    abstract public void testAdd(List<S> entityList) throws Exception;
+    abstract public void testAdd() throws Exception;
 
     @Test
     abstract public void testRemove() throws Exception;

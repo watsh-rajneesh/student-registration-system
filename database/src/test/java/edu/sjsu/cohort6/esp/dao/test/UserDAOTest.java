@@ -17,15 +17,13 @@ package edu.sjsu.cohort6.esp.dao.test;
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.mongodb.UserDAO;
 
-import java.util.List;
-
 /**
  * @author rwatsh on 9/24/15.
  */
 public class UserDAOTest extends DBTest<UserDAO, User> {
 
     @Override
-    public void testAdd(List<User> entityList) {
+    public void testAdd() {
         testCreateUser();
     }
 

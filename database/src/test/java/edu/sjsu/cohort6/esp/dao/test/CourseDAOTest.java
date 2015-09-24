@@ -35,7 +35,7 @@ public class CourseDAOTest extends DBTest<CourseDAO, Course> {
     private static final Logger log = Logger.getLogger(CourseDAOTest.class.getName());
 
     @Override
-    public void testAdd(List<Course> entityList) throws Exception {
+    public void testAdd() throws Exception {
         testCreateCourse();
     }
 
@@ -73,13 +73,23 @@ public class CourseDAOTest extends DBTest<CourseDAO, Course> {
 
     // Additional course specific tests.
 
+    /**
+     * Complex queries test.
+     *
+     * @param m
+     * @return
+     * @see http://docs.mongodb.org/manual/reference/sql-comparison/
+     * @see http://mongodb.github.io/morphia/1.1/guides/querying/
+     */
     @DataProvider(name = "dp")
     public Object[][] createData(Method m) {
         System.out.println(m.getName());  // print test method name
             return new Object[][]{
                     {"{ price: { $gte: 100}}", 1},
                     {"{ price: { $gte: 100}, keywords: \"REST\", keywords: \"Java\" }", 1},
-                    {"{ price: { $gte: 100}, keywords: \"REST\", keywords: \"Java1\" }", 0}
+                    {"{ price: { $gte: 100}, keywords: \"REST\", keywords: \"Java1\" }", 0},
+                    {"{ location: \"Santa Clara, CA\"}", 1},
+                    {"{ $or: [ { location: \"Santa Clara, CA\" } ,  { price: {$lt: 500} } ] }", 1}
             };
 
         }

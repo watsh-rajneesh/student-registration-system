@@ -46,7 +46,7 @@ public class StudentDAOTest extends DBTest<StudentDAO, Student> {
     }
 
     @Override
-    public void testAdd(List<Student> entityList) {
+    public void testAdd() {
         testCreateStudents();
     }
 
