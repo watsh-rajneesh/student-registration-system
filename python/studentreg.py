@@ -27,8 +27,8 @@ from requests.auth import HTTPBasicAuth
 Global Constants
 """
 PASSWORD = 'secret'
-USER = 'admin'
-HTTPS = 'false'
+USER = 'watsh.rajneesh@sjsu.edu'
+HTTPS = '6a00b426-1243-4d80-a059-a1973e3482fe'
 
 
 def replace_value_with_definition(current_dict, key_to_find, definition):

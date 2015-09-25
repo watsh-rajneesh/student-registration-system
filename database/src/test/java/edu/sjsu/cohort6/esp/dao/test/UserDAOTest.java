@@ -16,11 +16,17 @@ package edu.sjsu.cohort6.esp.dao.test;
 
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.mongodb.UserDAO;
+import org.testng.Assert;
+
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author rwatsh on 9/24/15.
  */
 public class UserDAOTest extends DBTest<UserDAO, User> {
+
+    private static final Logger log = Logger.getLogger(UserDAOTest.class.getName());
 
     @Override
     public void testAdd() {
@@ -39,6 +45,10 @@ public class UserDAOTest extends DBTest<UserDAO, User> {
 
     @Override
     public void testFetch() throws Exception {
-
+        testCreateUser();
+        List<User> users = dao.fetchById(null);
+        log.info(users.toString());
+        Assert.assertNotNull(users);
+        Assert.assertTrue(!users.isEmpty(), "Could not fetch users");
     }
 }

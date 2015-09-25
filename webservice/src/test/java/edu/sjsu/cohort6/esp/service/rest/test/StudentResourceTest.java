@@ -18,6 +18,7 @@ import edu.sjsu.cohort6.esp.common.CommonUtils;
 import edu.sjsu.cohort6.esp.common.Student;
 import edu.sjsu.cohort6.esp.service.rest.EndpointUtils;
 import org.bson.types.ObjectId;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -48,7 +49,9 @@ public class StudentResourceTest {
     public void setUp() throws Exception {
         client = ClientBuilder.newClient();
         webTarget = client.target(BASE_URI);
-
+        HttpAuthenticationFeature feature = HttpAuthenticationFeature
+                .basic("watsh.rajneesh@sjsu.edu", "6a00b426-1243-4d80-a059-a1973e3482fe");
+        client.register(feature);
     }
 
     @AfterClass

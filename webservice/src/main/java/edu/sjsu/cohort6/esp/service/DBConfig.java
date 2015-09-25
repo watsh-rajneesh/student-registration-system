@@ -14,6 +14,7 @@
 
 package edu.sjsu.cohort6.esp.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -44,6 +45,12 @@ public class DBConfig {
 
     @NotEmpty
     private String dbName = "student_enrollment_db";
+    private DBClient dbClient;
+
+    @JsonIgnore
+    public DBClient getDbClient() {
+        return dbClient;
+    }
 
     @JsonProperty
     public String getServer() {
@@ -73,20 +80,23 @@ public class DBConfig {
     }
 
     public DBClient build(Environment environment) {
-        Module module = new DatabaseModule();
-        Guice.createInjector(module).injectMembers(this);
-        DBClient client = dbFactory.create(server, port, dbName);
         environment.lifecycle().manage(new Managed() {
             @Override
             public void start() throws Exception {
-                client.useDB(dbName);
+                dbClient.useDB(dbName);
             }
 
             @Override
             public void stop() throws Exception {
-                client.close();
+                dbClient.close();
             }
         });
-        return client;
+        return dbClient;
+    }
+
+    public DBConfig() {
+        Module module = new DatabaseModule();
+        Guice.createInjector(module).injectMembers(this);
+        dbClient = dbFactory.create(server, port, dbName);
     }
 }
