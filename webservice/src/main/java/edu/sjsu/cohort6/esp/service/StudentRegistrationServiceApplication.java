@@ -74,9 +74,9 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
                 User.class))); // backing DB object
 
         environment.healthChecks().register("database", new DBHealthCheck(dbClient));
-        configureCors(environment);
+        //configureCors(environment);
         final StudentResource studentResource = new StudentResource(dbClient);
-        environment.jersey().setUrlPattern(EndpointUtils.ENDPOINT_ROOT + "/api/*");
+        environment.jersey().setUrlPattern(EndpointUtils.ENDPOINT_ROOT + "/*");
         environment.jersey().register(studentResource);
     }
 

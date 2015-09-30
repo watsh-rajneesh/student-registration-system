@@ -21,16 +21,12 @@ import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
 import io.dropwizard.auth.Auth;
 import org.bson.types.ObjectId;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 
 import javax.validation.Valid;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -44,9 +40,7 @@ public class StudentResource extends BaseResource<Student> {
 
     private static final Logger log = Logger.getLogger(StudentResource.class.getName());
 
-    public JacksonDBCollection<Student, String> getJacksonDBCollection() {
-        return JacksonDBCollection.wrap(studentDAO.getCollection(), Student.class, String.class);
-    }
+
 
 
     public StudentResource(DBClient client) {
@@ -55,16 +49,14 @@ public class StudentResource extends BaseResource<Student> {
 
 
     @Override
-    public Student create(@Auth User user, @Valid Student student, @Context UriInfo info) {
+    public Response create(@Auth User user, @Valid Student student, @Context UriInfo info) {
         try {
-            /*log.info(MessageFormat.format("Creating student with user name {0}", user.getUserName()));
             List<Student> studentList = new ArrayList<>();
             studentList.add(student);
             List<String> studentIds = studentDAO.add(studentList);
-            log.info(MessageFormat.format("Created student with user name {0}", user.getUserName()));
-            return Response.ok().build();*/
-            WriteResult<Student, String> result = getJacksonDBCollection().insert(student);
-            return result.getSavedObject();
+            return Response.created(UriBuilder.fromResource(getClass())
+                    .build(student, studentIds.get(0)))
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
             throw new edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException();
@@ -72,23 +64,21 @@ public class StudentResource extends BaseResource<Student> {
     }
 
     @Override
-    public List<Student> list(@Auth User user) {
-        /*List<String> studentIds = new ArrayList<>();
+    public List list(@Auth User user) {
+        List<String> studentIds = new ArrayList<>();
         List<Student> studentList = studentDAO.fetchById(studentIds);
-        return studentList;*/
-        return getJacksonDBCollection().find().toArray();
+        return studentList;
     }
 
     @Override
     public Student retrieve(@Auth User user, @PathParam("id") String studentId) throws ResourceNotFoundException {
-        /*List<String> studentIds = getStudentIdsList(studentId);
+        List<String> studentIds = getStudentIdsList(studentId);
         List<Student> studentList = studentDAO.fetchById(studentIds);
         if (studentList != null && !studentList.isEmpty()) {
             return studentList.get(0);
         } else {
             throw new ResourceNotFoundException();
-        }*/
-        return getJacksonDBCollection().findOneById(studentId);
+        }
     }
 
     private List<String> getStudentIdsList(String studentId) {
@@ -117,26 +107,22 @@ public class StudentResource extends BaseResource<Student> {
     public Student update(@Auth User user, @PathParam("id") String id, @Valid Student student) throws ResourceNotFoundException {
         student.setId(new ObjectId(id));
         try {
-            /*studentDAO.update(getStudentsList(student));
+            studentDAO.update(getStudentsList(student));
             List<Student> studentList = studentDAO.fetchById(getStudentIdsList(id));
             if (studentList != null && !studentList.isEmpty()) {
                 return studentList.get(0);
             }
-            throw new ResourceNotFoundException();*/
-            WriteResult<Student, String> writeResult = getJacksonDBCollection().updateById(id, student);
-            return writeResult.getSavedObject();
+            throw new ResourceNotFoundException();
         } catch (Exception e) {
             throw new InternalErrorException(e);
         }
     }
 
     @Override
-    public int delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException {
+    public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException {
         try {
-            /*studentDAO.remove(getStudentIdsList(id));
-            return Response.ok().build();*/
-            WriteResult<Student, String> writeResult = getJacksonDBCollection().removeById(id);
-            return writeResult.getN();
+            studentDAO.remove(getStudentIdsList(id));
+            return Response.ok().build();
         } catch (Exception e) {
             throw new ResourceNotFoundException();
         }

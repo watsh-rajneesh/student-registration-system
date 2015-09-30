@@ -23,6 +23,7 @@ import io.dropwizard.servlets.assets.ResourceNotFoundException;
 import javax.validation.Valid;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class UserResource extends BaseResource<User> {
     }
 
     @Override
-    public User create(@Auth User user, @Valid User model, @Context UriInfo info) {
+    public Response create(@Auth User user, @Valid User model, @Context UriInfo info) {
         return null;
     }
 
@@ -56,7 +57,7 @@ public class UserResource extends BaseResource<User> {
     }
 
     @Override
-    public int delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
+    public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         return null;
     }
 }
