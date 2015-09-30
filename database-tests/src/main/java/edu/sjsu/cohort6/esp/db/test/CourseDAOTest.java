@@ -12,7 +12,7 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.esp.dao.test;
+package edu.sjsu.cohort6.esp.db.test;
 
 import edu.sjsu.cohort6.esp.common.Course;
 import edu.sjsu.cohort6.esp.dao.mongodb.CourseDAO;
@@ -84,15 +84,16 @@ public class CourseDAOTest extends DBTest<CourseDAO, Course> {
     @DataProvider(name = "dp")
     public Object[][] createData(Method m) {
         System.out.println(m.getName());  // print test method name
-            return new Object[][]{
-                    {"{ price: { $gte: 100}}", 1},
-                    {"{ price: { $gte: 100}, keywords: \"REST\", keywords: \"Java\" }", 1},
-                    {"{ price: { $gte: 100}, keywords: \"REST\", keywords: \"Java1\" }", 0},
-                    {"{ location: \"Santa Clara, CA\"}", 1},
-                    {"{ $or: [ { location: \"Santa Clara, CA\" } ,  { price: {$lt: 500} } ] }", 1}
-            };
+        return new Object[][]{
+                {"{ price: { $gte: 100}}", 1},
+                {"{ price: { $gte: 100}, keywords: \"REST\", keywords: \"Java\" }", 1},
+                {"{ price: { $gte: 100}, keywords: \"REST\", keywords: \"Java1\" }", 0},
+                {"{ location: \"Santa Clara, CA\"}", 1},
+                {"{ $or: [ { location: \"Santa Clara, CA\" } ,  { price: {$lt: 500} } ] }", 1}
+        };
 
-        }
+    }
+
     @Test(dataProvider = "dp")
     public void testFetchParametrized(String query, int expectedCount) throws ParseException {
         testCreateCourse();

@@ -84,7 +84,7 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
                     .set("courseRefs", s.getCourseRefs())
                     .set("user", s.getUser());
 
-            Query<Student> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(s.get_id());
+            Query<Student> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(s.getId());
             this.update(updateQuery, ops);
         }
     }

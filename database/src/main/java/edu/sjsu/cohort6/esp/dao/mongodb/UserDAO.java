@@ -82,7 +82,7 @@ public class UserDAO extends BasicDAO<User, String> implements BaseDAO<User> {
                     .set("firstName", u.getFirstName())
                     .set("userName", u.getUserName());
 
-            Query<User> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(u.get_id());
+            Query<User> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(u.getId());
             this.update(updateQuery, ops);
         }
     }

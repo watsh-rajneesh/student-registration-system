@@ -14,13 +14,10 @@
 
 package edu.sjsu.cohort6.esp.common;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,19 +25,19 @@ import java.util.logging.Logger;
 
 /**
  * Student entity.
- *
+ * <p>
  * Student document will have a user entity reference.
  * Student document may have one or more course references.
- *
+ * <p>
  * Some annotations are per morphia and some per dropwizard frameworks.
  * This POJO will be used across DB, Web service and UI.
- *
+ * <p>
  * {
-     "_id" : ObjectId("5603cf1ed3fde88bbc372003"),
-     "className" : "edu.sjsu.cohort6.esp.common.Student",
-     "user" : DBRef("user", ObjectId("5603cf1ed3fde88bbc372002")),
-     "lastUpdated" : ISODate("2015-09-24T10:23:26.128Z")
- }
+ * "_id" : ObjectId("5603cf1ed3fde88bbc372003"),
+ * "className" : "edu.sjsu.cohort6.esp.common.Student",
+ * "user" : DBRef("user", ObjectId("5603cf1ed3fde88bbc372002")),
+ * "lastUpdated" : ISODate("2015-09-24T10:23:26.128Z")
+ * }
  *
  * @author rwatsh
  */
@@ -48,21 +45,23 @@ import java.util.logging.Logger;
 @Indexes(
         @Index(value = "emailId", fields = @Field("emailId"))
 )
-@JsonIgnoreProperties({"_id"})
-
 public class Student extends BaseModel {
     @Id
-    private ObjectId _id;
-    @Transient
-    private String id;
+    private ObjectId id;
+
+
     @Reference
     private User user;
+
     @Reference
     private List<Course> courseRefs;
 
     Date lastUpdated = new Date();
 
-    @PrePersist void prePersist() {lastUpdated = new Date();}
+    @PrePersist
+    void prePersist() {
+        lastUpdated = new Date();
+    }
 
     private static final Logger log = Logger.getLogger(Student.class.getName());
 
@@ -71,24 +70,16 @@ public class Student extends BaseModel {
         this.courseRefs = new ArrayList<>();
     }
 
-    public Student() {}
-
-    public ObjectId get_id() {
-        return _id;
-    }
-
-    public void set_id(ObjectId _id) {
-        this._id = _id;
+    public Student() {
     }
 
     @JsonProperty
-    public String getId() {
-        return _id != null ? _id.toHexString() : null;
+    public ObjectId getId() {
+        return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
-        this._id = new ObjectId(id);
     }
 
     @JsonProperty
@@ -110,14 +101,6 @@ public class Student extends BaseModel {
         this.courseRefs = courseRefs;
     }
 
-    // note: name does not matter; never auto-detected, need to annotate
-    // (also note that formal argument type #1 must be "String"; second one is usually
-    //  "Object", but can be something else -- as long as JSON can be bound to that type)
-
-    @JsonAnySetter
-    public void handleUnknown(String key, Object value) {
-        log.warning(MessageFormat.format("Unknown property key {0} value {1}", key, value));
-    }
 
     @JsonProperty
     public User getUser() {
@@ -131,7 +114,7 @@ public class Student extends BaseModel {
     @Override
     public String toString() {
         return "Student{" +
-                "id=" + (_id != null ?_id.toHexString() : _id) +
+                "id=" + (id != null ? id.toHexString() : "") +
                 ", user=" + user +
                 ", courseRefs=" + courseRefs +
                 ", lastUpdated=" + lastUpdated +

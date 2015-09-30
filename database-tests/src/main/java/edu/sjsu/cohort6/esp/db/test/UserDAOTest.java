@@ -12,7 +12,7 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.esp.dao.test;
+package edu.sjsu.cohort6.esp.db.test;
 
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.mongodb.UserDAO;

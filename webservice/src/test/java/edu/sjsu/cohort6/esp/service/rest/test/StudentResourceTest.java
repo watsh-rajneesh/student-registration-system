@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  */
 public class StudentResourceTest {
 
-    public static final String BASE_URI = "http://localhost:8080";
+    public static final String BASE_URI = "http://localhost:9999";
     public static final String STUDENT_RESOURCE_URI = EndpointUtils.ENDPOINT_ROOT + "/students";
     private Client client;
     private WebTarget webTarget;
@@ -48,10 +48,10 @@ public class StudentResourceTest {
     @BeforeClass
     public void setUp() throws Exception {
         client = ClientBuilder.newClient();
-        webTarget = client.target(BASE_URI);
         HttpAuthenticationFeature feature = HttpAuthenticationFeature
                 .basic("watsh.rajneesh@sjsu.edu", "6a00b426-1243-4d80-a059-a1973e3482fe");
         client.register(feature);
+        webTarget = client.target(BASE_URI);
     }
 
     @AfterClass
@@ -83,7 +83,7 @@ public class StudentResourceTest {
     public void testGetStudent() throws Exception {
         List<Student> studentList = getStudents();
         if (studentList != null && !studentList.isEmpty()) {
-            ObjectId id = studentList.get(0).get_id();
+            ObjectId id = studentList.get(0).getId();
 
             Response response = webTarget.path(STUDENT_RESOURCE_URI)
                     .queryParam("id", id.toHexString())
@@ -108,7 +108,7 @@ public class StudentResourceTest {
     private Student createStudent() throws Exception {
         Student s = new Student();
         Invocation.Builder invocationBuilder = webTarget.path(STUDENT_RESOURCE_URI)
-                .request().accept(MediaType.APPLICATION_JSON_TYPE);
+                .request().accept(MediaType.APPLICATION_JSON_TYPE).header("content-type", MediaType.APPLICATION_JSON);
 
         Response response = invocationBuilder.post(Entity.entity(s, MediaType.APPLICATION_JSON_TYPE));
 

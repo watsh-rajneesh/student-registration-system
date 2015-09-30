@@ -14,7 +14,6 @@
 
 package edu.sjsu.cohort6.esp.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
@@ -25,29 +24,29 @@ import java.util.logging.Logger;
 
 /**
  * Course entity.
- *  db.course.find().pretty()
- {
-     "_id" : ObjectId("5603cf1ed3fde88bbc371fff"),
-     "className" : "edu.sjsu.cohort6.esp.common.Course",
-     "courseName" : "Cloud Technologies",
-     "instructors" : [
-         "Ahmad Nouri",
-         "Thomas Hildebrand",
-         "Aktouf"
-     ],
-     "startTime" : ISODate("2015-10-10T17:30:00Z"),
-     "endTime" : ISODate("2015-11-10T21:00:00Z"),
-     "availabilityStatus" : 1,
-     "maxCapacity" : 20,
-     "price" : 200,
-     "location" : "Santa Clara, CA",
-     "keywords" : [
-         "Java",
-         "MongoDB",
-         "REST"
-     ],
-     "lastUpdated" : ISODate("2015-09-24T10:23:26.102Z")
- }
+ * db.course.find().pretty()
+ * {
+ * "_id" : ObjectId("5603cf1ed3fde88bbc371fff"),
+ * "className" : "edu.sjsu.cohort6.esp.common.Course",
+ * "courseName" : "Cloud Technologies",
+ * "instructors" : [
+ * "Ahmad Nouri",
+ * "Thomas Hildebrand",
+ * "Aktouf"
+ * ],
+ * "startTime" : ISODate("2015-10-10T17:30:00Z"),
+ * "endTime" : ISODate("2015-11-10T21:00:00Z"),
+ * "availabilityStatus" : 1,
+ * "maxCapacity" : 20,
+ * "price" : 200,
+ * "location" : "Santa Clara, CA",
+ * "keywords" : [
+ * "Java",
+ * "MongoDB",
+ * "REST"
+ * ],
+ * "lastUpdated" : ISODate("2015-09-24T10:23:26.102Z")
+ * }
  *
  * @author rwatsh
  */
@@ -55,13 +54,11 @@ import java.util.logging.Logger;
 @Indexes(
         @Index(value = "courseName", fields = @Field("courseName"))
 )
-@JsonIgnoreProperties({"_id"})
 public class Course extends BaseModel {
     @Id
-    private ObjectId _id;
-    @Transient
-    private String id;
-    @Indexed(name="courseName", unique=true,dropDups=true)
+    private ObjectId id;
+
+    @Indexed(name = "courseName", unique = true, dropDups = true)
     private String courseName;
     private List<String> instructors;
     private Date startTime;
@@ -79,9 +76,13 @@ public class Course extends BaseModel {
 
     private static final Logger log = Logger.getLogger(Course.class.getName());
 
-    @PrePersist void prePersist() {lastUpdated = new Date();}
+    @PrePersist
+    void prePersist() {
+        lastUpdated = new Date();
+    }
 
-    public Course() {}
+    public Course() {
+    }
 
     public static class Builder {
         private String courseName;
@@ -158,23 +159,15 @@ public class Course extends BaseModel {
         //this.studentRefs = b.studentRefs;
     }
 
-    public ObjectId get_id() {
-        return _id;
-    }
-
-    public void set_id(ObjectId id) {
-        this._id = id;
-    }
-
     @JsonProperty
-    public String getId() {
-        return _id != null ? _id.toHexString() : null;
+    public ObjectId getId() {
+        return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
-        this._id = new ObjectId(id);
     }
+
 
     @JsonProperty
     public Date getLastUpdated() {
@@ -277,7 +270,7 @@ public class Course extends BaseModel {
     @Override
     public String toString() {
         return "Course{" +
-                "id=" + (_id != null ?_id.toHexString() : _id ) +
+                "id=" + (id != null ? id.toHexString() : "") +
                 ", courseName='" + courseName + '\'' +
                 ", instructors=" + instructors +
                 ", startTime=" + startTime +

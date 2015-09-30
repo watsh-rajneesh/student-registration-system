@@ -91,8 +91,7 @@ public class MongoDBClient implements DBClient {
         this.dbName = dbName;
         mongoClient = new MongoClient(server, port);
         morphia = new Morphia();
-        morphia.map(Student.class);
-        morphia.map(Course.class);
+        morphia.mapPackageFromClass(Student.class);
         morphiaDatastore = morphia.createDatastore(mongoClient, dbName);
         studentDAO = new StudentDAO(mongoClient, morphia, dbName);
         courseDAO = new CourseDAO(mongoClient, morphia, dbName);
@@ -112,7 +111,7 @@ public class MongoDBClient implements DBClient {
     @Override
     public boolean checkHealth() {
         try {
-            morphiaDatastore.getDB().getStats();
+            mongoClient.listDatabaseNames();
             return true;
         } catch(Exception e) {
             return false;
@@ -136,6 +135,11 @@ public class MongoDBClient implements DBClient {
             }
         }
         return null;
+    }
+
+    @Override
+    public Morphia getMorphia() {
+        return morphia;
     }
 
     @Override

@@ -14,7 +14,6 @@
 
 package edu.sjsu.cohort6.esp.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
@@ -24,23 +23,23 @@ import java.util.Date;
 
 /**
  * A user of the system. User can have roles.
- *
+ * <p>
  * User documents are referenced by Student documents.
  * User documents will have embedded role info (whether user is admin or student).
- *
- "{
-     _id" : ObjectId("5603cf1ed3fde88bbc371ffd"),
-     "className" : "edu.sjsu.cohort6.esp.common.User",
-     "emailId" : "watsh.rajneesh@sjsu.edu",
-     "userName" : "watsh.rajneesh@sjsu.edu",
-     "token" : "3cc28509-350a-4e70-8f79-28798199f37b",
-     "firstName" : "Watsh",
-     "lastName" : "Rajneesh",
-     "role" : {
-        "role" : "STUDENT"
-     },
-     "lastUpdated" : ISODate("2015-09-24T10:23:26.095Z")
- }
+ * <p>
+ * "{
+ * _id" : ObjectId("5603cf1ed3fde88bbc371ffd"),
+ * "className" : "edu.sjsu.cohort6.esp.common.User",
+ * "emailId" : "watsh.rajneesh@sjsu.edu",
+ * "userName" : "watsh.rajneesh@sjsu.edu",
+ * "token" : "3cc28509-350a-4e70-8f79-28798199f37b",
+ * "firstName" : "Watsh",
+ * "lastName" : "Rajneesh",
+ * "role" : {
+ * "role" : "STUDENT"
+ * },
+ * "lastUpdated" : ISODate("2015-09-24T10:23:26.095Z")
+ * }
  *
  * @author rwatsh on 9/23/15.
  */
@@ -49,13 +48,11 @@ import java.util.Date;
         @Index(value = "emailId", fields = @Field("emailId")),
         @Index(value = "userName", fields = @Field("userName"))
 })
-@JsonIgnoreProperties({"_id"})
 public class User extends BaseModel {
     @Id
-    private ObjectId _id;
-    @Transient
-    private String id;
-    @Indexed(name="emailId", unique=true,dropDups=true)
+    private ObjectId id;
+
+    @Indexed(name = "emailId", unique = true, dropDups = true)
     @NotNull
     private String emailId;
     @NotNull
@@ -73,10 +70,13 @@ public class User extends BaseModel {
     Date lastUpdated = new Date();
 
     @PrePersist
-    void prePersist() {lastUpdated = new Date();}
+    void prePersist() {
+        lastUpdated = new Date();
+    }
 
 
-    public User() {}
+    public User() {
+    }
 
     public User(String emailId, String userName, String firstName, String lastName, Role role) {
         this.emailId = emailId;
@@ -91,23 +91,15 @@ public class User extends BaseModel {
         }
     }
 
-    public ObjectId get_id() {
-        return _id;
+    @JsonProperty("_id")
+    public ObjectId getId() {
+        return id;
     }
 
-    public void set_id(ObjectId _id) {
-        this._id = _id;
-    }
-
-    @JsonProperty
-    public String getId() {
-        return _id != null ? _id.toHexString() : null;
-    }
-
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
-        this._id = new ObjectId(id);
     }
+
 
     @JsonProperty
     public String getEmailId() {
@@ -163,10 +155,19 @@ public class User extends BaseModel {
         this.lastUpdated = lastUpdated;
     }
 
+    @JsonProperty
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     @Override
     public String toString() {
         return "User{" +
-                "id=" + (_id != null ?_id.toHexString() : _id) +
+                "id=" + (id != null ? id.toHexString() : "") +
                 ", emailId='" + emailId + '\'' +
                 ", userName='" + userName + '\'' +
                 ", token='" + token + '\'' +

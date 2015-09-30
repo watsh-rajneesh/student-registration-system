@@ -12,7 +12,7 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.esp.dao.test;
+package edu.sjsu.cohort6.esp.db.test;
 
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -46,7 +46,7 @@ public abstract class DBTest<T extends BaseDAO, S> {
     protected T dao;
     private Class<T> tClass;
 
-    public static final String TESTREG = "testreg";
+    public String dbName = "testreg";
     private static final Logger log = Logger.getLogger(DBTest.class.getName());
     protected DBClient client;
     private long startTime;
@@ -54,37 +54,40 @@ public abstract class DBTest<T extends BaseDAO, S> {
     public DBTest() {
         Module module = new DatabaseModule();
         Guice.createInjector(module).injectMembers(this);
-        client = dbFactory.create("localhost", 27017, TESTREG);
+
+    }
+
+    @BeforeClass
+    @Parameters({"server", "port", "dbName"})
+    public void setUp(@Optional("localhost") String server, @Optional("27017") String port, @Optional("testreg") String dbName) throws Exception {
+        client = dbFactory.create(server, Integer.parseInt(port), dbName);
+
+        this.dbName = dbName;
         /*
          * Use reflection to infer the class for T type.
          */
         this.tClass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0];
         dao = (T) client.getDAO(tClass);
-    }
-
-    @BeforeTest
-    public void setUp() throws Exception {
-
-        client.dropDB(TESTREG);
+        client.dropDB(this.dbName);
     }
 
 
-    @AfterTest
+    @AfterClass
     public void tearDown() throws Exception {
         client.close();
     }
 
     @BeforeMethod
     public void createDB() {
-        client.useDB(TESTREG);
+        client.useDB(dbName);
         log.info("********************");
         startTime = System.currentTimeMillis();
     }
 
     @AfterMethod
     public void dropDB() {
-        //client.dropDB(TESTREG);
+        //client.dropDB(dbName);
         long endTime = System.currentTimeMillis();
         long diff = endTime - startTime;
         log.info(MessageFormat.format("********* Time taken: {0} ms", diff));

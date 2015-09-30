@@ -14,6 +14,8 @@
 
 package edu.sjsu.cohort6.esp.service.cli;
 
+import edu.sjsu.cohort6.esp.common.Role;
+import edu.sjsu.cohort6.esp.common.RoleType;
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.dao.mongodb.UserDAO;
@@ -30,6 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Command line interface to create admin users.
+ *
  * @author rwatsh on 9/24/15.
  */
 public class CreateUserCommand extends ConfiguredCommand<StudentRegistrationServiceConfiguration> {
@@ -64,6 +68,8 @@ public class CreateUserCommand extends ConfiguredCommand<StudentRegistrationServ
             // Setting userName to be emailId for now.
             user.setUserName(user.getEmailId());
             user.setToken(user.randomUUID().toString());
+            user.setRole(new Role(RoleType.ADMIN));
+
             UserDAO userDAO = (UserDAO) dbClient.getDAO(UserDAO.class);
             userDAO.add(new ArrayList<User>(){{
                     add(user);

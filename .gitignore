@@ -57,3 +57,5 @@ target/
 .classpath
 .project
 .settings/
+/webapp/nbproject/private/
+/webapp/build/

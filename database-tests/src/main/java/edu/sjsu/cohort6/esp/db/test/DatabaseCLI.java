@@ -12,24 +12,23 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.esp.dao;
+package edu.sjsu.cohort6.esp.db.test;
 
-
-import org.mongodb.morphia.Morphia;
+import org.testng.TestListenerAdapter;
+import org.testng.TestNG;
 
 /**
- * A generic DB Client interface.
- *
- * @author rwatsh
+ * @author rwatsh on 9/29/15.
  */
-public interface DBClient extends AutoCloseable {
-    // Common operations which don't belong in entities.
-    void dropDB(String dbName);
-    void useDB(String dbName);
-    boolean checkHealth();
-    String getConnectString();
+public class DatabaseCLI {
+    public static void main(String[] args) throws ClassNotFoundException {
+        TestListenerAdapter tla = new TestListenerAdapter();
 
-    // Gets the entity DAO instance.
-    Object getDAO(Class<? extends BaseDAO> clazz);
-    Morphia getMorphia();
+        TestNG test = new TestNG();
+        //test.setTestClasses(new Class[]{StudentDAOTest.class, CourseDAOTest.class});
+        test.main(args);
+        test.addListener(tla);
+
+        test.run();
+    }
 }
