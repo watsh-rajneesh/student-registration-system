@@ -43,8 +43,14 @@ public class CommonUtils {
      */
     public static <T> List<T> convertJsonArrayToList(String jsonArrayStr, Class<T> clazz) throws java.io.IOException {
         ObjectMapper mapper = new ObjectMapper();
+        jsonArrayStr = removeIdField(jsonArrayStr);
         return mapper.readValue(jsonArrayStr,
                 TypeFactory.defaultInstance().constructCollectionType(List.class, clazz));
+    }
+
+    private static String removeIdField(String str) {
+
+        return str.replaceAll("\\\"id\\\":null,", "");
     }
 
     /**
@@ -58,6 +64,7 @@ public class CommonUtils {
      */
     public static <T> T convertJsonToObject(String jsonStr, Class<T> clazz) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
+        jsonStr = removeIdField(jsonStr);
         return mapper.readValue(jsonStr, clazz);
     }
 
@@ -75,10 +82,10 @@ public class CommonUtils {
         return mapper.writeValueAsString(object);
     }
 
-    public static String sanitizeIdString(String id) {
+    /*public static String sanitizeIdString(String id) {
         id = id.replaceAll("[\\\"\\']", "");
         return id;
-    }
+    }*/
 
     private static String generateMD5Hash(String plaintext) throws NoSuchAlgorithmException {
         MessageDigest m = MessageDigest.getInstance("MD5");

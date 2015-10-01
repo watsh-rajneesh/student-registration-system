@@ -14,7 +14,6 @@
 
 package edu.sjsu.cohort6.esp.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.hibernate.validator.constraints.Email;
@@ -45,14 +44,10 @@ import java.util.Date;
  *
  * @author rwatsh on 9/23/15.
  */
-@Entity(value = "course" , noClassnameStored = true, concern = "SAFE")
-@JsonIgnoreProperties({"_id"})
+@Entity(value = "users" , noClassnameStored = true, concern = "SAFE")
 public class User extends BaseModel {
     @Id
-    private ObjectId _id;
-
-    @Transient
-    private String id;
+    private String id = new ObjectId().toHexString();
 
     @Indexed(unique = true)
     @NotNull
@@ -93,15 +88,6 @@ public class User extends BaseModel {
             this.role = role;
         }
     }
-
-    public ObjectId get_id() {
-        return _id;
-    }
-
-    public void set_id(ObjectId id) {
-        this._id = id;
-    }
-
 
     @JsonProperty
     public String getEmailId() {
@@ -168,18 +154,17 @@ public class User extends BaseModel {
 
     @JsonProperty
     public String getId() {
-        return _id != null ? _id.toHexString() : null;
+        return id;
     }
 
     public void setId(String id) {
-        this.id = id;
-        this._id = new ObjectId(id);
+        this.id = id != null ? new ObjectId(id).toHexString() : new ObjectId().toHexString();
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "id=" + (_id != null ? _id.toHexString() : "") +
+                "id=" + id +
                 ", emailId='" + emailId + '\'' +
                 ", userName='" + userName + '\'' +
                 ", token='" + token + '\'' +

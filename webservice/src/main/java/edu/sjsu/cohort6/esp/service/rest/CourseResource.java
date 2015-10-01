@@ -15,10 +15,8 @@
 package edu.sjsu.cohort6.esp.service.rest;
 
 import edu.sjsu.cohort6.esp.common.Course;
-import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
-import io.dropwizard.auth.Auth;
 import io.dropwizard.servlets.assets.ResourceNotFoundException;
 
 import javax.validation.Valid;
@@ -44,14 +42,14 @@ public class CourseResource extends BaseResource<Course> {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(@Auth User user, @Valid String courseJson, @Context UriInfo info) {
+    public Response create(/*@Auth User user,*/ @Valid String courseJson, @Context UriInfo info) {
         return null;
     }
 
     @Override
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Course> list(@Auth User user) throws InternalErrorException {
+    public List<Course> list(/*@Auth User user*/) throws InternalErrorException {
         return null;
     }
 
@@ -59,7 +57,7 @@ public class CourseResource extends BaseResource<Course> {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Course retrieve(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
+    public Course retrieve(/*@Auth User user,*/ @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         return null;
     }
 
@@ -68,7 +66,7 @@ public class CourseResource extends BaseResource<Course> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Course update(@Auth User user, @PathParam("id") String id, @Valid Course entity) throws ResourceNotFoundException, InternalErrorException {
+    public Course update(/*@Auth User user,*/ @PathParam("id") String id, @Valid Course entity) throws ResourceNotFoundException, InternalErrorException {
         return null;
     }
 
@@ -76,7 +74,7 @@ public class CourseResource extends BaseResource<Course> {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
+    public Response delete(/*@Auth User user,*/ @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         return null;
     }
 }

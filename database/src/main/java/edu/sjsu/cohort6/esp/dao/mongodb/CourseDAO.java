@@ -81,7 +81,7 @@ public class CourseDAO extends BasicDAO<Course, String> implements BaseDAO<Cours
                             //.set("startDate", course.getStartDate())
                     .set("startTime", course.getStartTime());
 
-            Query<Course> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(course.get_id());
+            Query<Course> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(new ObjectId(course.getId()));
             this.update(updateQuery, ops);
         }
     }

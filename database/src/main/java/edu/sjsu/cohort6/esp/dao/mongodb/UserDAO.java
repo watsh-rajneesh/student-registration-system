@@ -19,7 +19,6 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
-import edu.sjsu.cohort6.esp.common.CommonUtils;
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.BaseDAO;
 import org.bson.types.ObjectId;
@@ -82,7 +81,7 @@ public class UserDAO extends BasicDAO<User, String> implements BaseDAO<User> {
                     .set("firstName", u.getFirstName())
                     .set("userName", u.getUserName());
 
-            Query<User> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(u.get_id());
+            Query<User> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(new ObjectId(u.getId()));
             this.update(updateQuery, ops);
         }
     }
@@ -95,7 +94,7 @@ public class UserDAO extends BasicDAO<User, String> implements BaseDAO<User> {
         if (entityIdsList != null) {
             for (String id : entityIdsList) {
                 if (id != null) {
-                    id = CommonUtils.sanitizeIdString(id);
+                    //id = CommonUtils.sanitizeIdString(id);
                     objectIds.add(new ObjectId(id));
                 }
             }
@@ -134,9 +133,13 @@ public class UserDAO extends BasicDAO<User, String> implements BaseDAO<User> {
      * @param password
      * @return
      */
-    public Optional<User> getUserByCredentials(String username, String password) {
+    public Optional<User> getUserByCredentials(String username, String password) throws RuntimeException {
         Query<User> query =  this.createQuery().field("userName").equal(username).field("token").equal(password);
         QueryResults<User> results = this.find(query);
-        return Optional.of(results.get());
+        if (results != null) {
+            return Optional.fromNullable(results.get());
+        } else {
+            throw new RuntimeException("No user exists, please create an admin user account");
+        }
     }
 }

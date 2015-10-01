@@ -22,7 +22,6 @@ import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
-import io.dropwizard.auth.Auth;
 import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
@@ -58,7 +57,7 @@ public class StudentResource extends BaseResource<Student> {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(@Auth User user, @Valid String studentJson, @Context UriInfo info) {
+    public Response create(/*@Auth User user,*/ @Valid String studentJson, @Context UriInfo info) {
         try {
             Student s = CommonUtils.convertJsonToObject(studentJson, Student.class);
             List<Student> studentList = new ArrayList<>();
@@ -80,8 +79,7 @@ public class StudentResource extends BaseResource<Student> {
         if (courses != null && !courses.isEmpty()) {
             // find course by name
             for (Course course : courses) {
-                Course c = courseDAO.fetchCourseByName(course.getCourseName());
-                course.set_id(c.get_id());
+                courseDAO.fetchCourseByName(course.getCourseName());
             }
         }
     }
@@ -96,7 +94,7 @@ public class StudentResource extends BaseResource<Student> {
     @Override
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List list(@Auth User user) {
+    public List list(/*@Auth User user*/) {
         List<String> studentIds = new ArrayList<>();
         List<Student> studentList = studentDAO.fetchById(studentIds);
         return studentList;
@@ -106,7 +104,7 @@ public class StudentResource extends BaseResource<Student> {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Student retrieve(@Auth User user, @PathParam("id") String studentId) throws ResourceNotFoundException {
+    public Student retrieve(/*@Auth User user, */@PathParam("id") String studentId) throws ResourceNotFoundException {
         List<String> studentIds = getStudentIdsList(studentId);
         List<Student> studentList = studentDAO.fetchById(studentIds);
         if (studentList != null && !studentList.isEmpty()) {
@@ -143,8 +141,8 @@ public class StudentResource extends BaseResource<Student> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Student update(@Auth User user, @PathParam("id") String id, @Valid Student student) throws ResourceNotFoundException {
-        student.set_id(new ObjectId(id));
+    public Student update(/*@Auth User user,*/ @PathParam("id") String id, @Valid Student student) throws ResourceNotFoundException {
+        student.setId(new ObjectId(id).toString());
         try {
             studentDAO.update(getStudentsList(student));
             List<Student> studentList = studentDAO.fetchById(getStudentIdsList(id));
@@ -161,7 +159,7 @@ public class StudentResource extends BaseResource<Student> {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException {
+    public Response delete(/*@Auth User user,*/ @PathParam("id") String id) throws ResourceNotFoundException {
         try {
             studentDAO.remove(getStudentIdsList(id));
             return Response.ok().build();

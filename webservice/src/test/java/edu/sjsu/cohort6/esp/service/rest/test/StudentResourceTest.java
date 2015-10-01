@@ -20,8 +20,6 @@ import edu.sjsu.cohort6.esp.common.Student;
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.db.test.DBTest;
 import edu.sjsu.cohort6.esp.service.rest.EndpointUtils;
-import org.bson.types.ObjectId;
-import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -52,9 +50,9 @@ public class StudentResourceTest {
     @BeforeClass
     public void setUp() throws Exception {
         client = ClientBuilder.newClient();
-        HttpAuthenticationFeature feature = HttpAuthenticationFeature
-                .basic("watsh.rajneesh@sjsu.edu", "7ce278cd-f6ae-4173-9a1d-1aa7b9879c26");
-        client.register(feature);
+        /*HttpAuthenticationFeature feature = HttpAuthenticationFeature
+                .basic("nilay.kothari@sjsu.edu", "56cdf9a7-0f75-490f-88cf-03d7f57cb9b8");
+        client.register(feature);*/
         webTarget = client.target(BASE_URI);
     }
 
@@ -87,10 +85,10 @@ public class StudentResourceTest {
     public void testGetStudent() throws Exception {
         List<Student> studentList = getStudents();
         if (studentList != null && !studentList.isEmpty()) {
-            ObjectId id = studentList.get(0).get_id();
+            String id = studentList.get(0).getId();
 
             Response response = webTarget.path(STUDENT_RESOURCE_URI)
-                    .queryParam("id", id.toHexString())
+                    .queryParam("id", id)
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .get();
             log.info(response.toString());
@@ -115,7 +113,7 @@ public class StudentResourceTest {
         s.setUser(user);
         Course c = DBTest.getTestCourse();
         List<Course> courses = new ArrayList<>();
-        //courses.add(c);
+        courses.add(c);
         s.setCourseRefs(courses);
 
         // Convert to string

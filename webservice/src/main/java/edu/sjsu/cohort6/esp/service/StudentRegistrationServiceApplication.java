@@ -14,19 +14,13 @@
 
 package edu.sjsu.cohort6.esp.service;
 
-import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
-import edu.sjsu.cohort6.esp.service.auth.SimpleAuthenticator;
 import edu.sjsu.cohort6.esp.service.cli.CreateUserCommand;
 import edu.sjsu.cohort6.esp.service.cli.ListUserCommand;
 import edu.sjsu.cohort6.esp.service.health.DBHealthCheck;
 import edu.sjsu.cohort6.esp.service.rest.*;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
-import io.dropwizard.auth.AuthFactory;
-import io.dropwizard.auth.Authenticator;
-import io.dropwizard.auth.basic.BasicAuthFactory;
-import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -62,10 +56,10 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
     @Override
     public void run(StudentRegistrationServiceConfiguration studentRegistrationServiceConfiguration, Environment environment) throws Exception {
         dbClient = studentRegistrationServiceConfiguration.getDbConfig().build(environment);
-        Authenticator<BasicCredentials, User> simpleAuthenticator = new SimpleAuthenticator(dbClient);
-        environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<User>(simpleAuthenticator,
+        //Authenticator<BasicCredentials, User> simpleAuthenticator = new SimpleAuthenticator(dbClient);
+        /*environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<User>(simpleAuthenticator,
                 "studentreg", // realm name
-                User.class))); // backing DB object
+                User.class))); // backing DB object*/
 
         environment.healthChecks().register("database", new DBHealthCheck(dbClient));
         environment.jersey().register(new CORSFilter());
