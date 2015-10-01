@@ -14,6 +14,7 @@
 
 package edu.sjsu.cohort6.esp.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
@@ -41,14 +42,14 @@ import java.util.logging.Logger;
  *
  * @author rwatsh
  */
-@Entity("student")
-@Indexes(
-        @Index(value = "emailId", fields = @Field("emailId"))
-)
+@Entity(value = "course" , noClassnameStored = true, concern = "SAFE")
+@JsonIgnoreProperties({"_id"})
 public class Student extends BaseModel {
     @Id
-    private ObjectId id;
+    private ObjectId _id;
 
+    @Transient
+    private String id;
 
     @Reference
     private User user;
@@ -73,13 +74,13 @@ public class Student extends BaseModel {
     public Student() {
     }
 
-    @JsonProperty
-    public ObjectId getId() {
-        return id;
+
+    public ObjectId get_id() {
+        return _id;
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
+    public void set_id(ObjectId id) {
+        this._id = id;
     }
 
     @JsonProperty
@@ -111,10 +112,20 @@ public class Student extends BaseModel {
         this.user = user;
     }
 
+    @JsonProperty
+    public String getId() {
+        return _id != null? _id.toHexString() : null;
+    }
+
+    public void setId(String id) {
+        this._id = new ObjectId(id);
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "Student{" +
-                "id=" + (id != null ? id.toHexString() : "") +
+                "id=" + (_id != null ? _id.toHexString() : "") +
                 ", user=" + user +
                 ", courseRefs=" + courseRefs +
                 ", lastUpdated=" + lastUpdated +

@@ -22,8 +22,9 @@ import io.dropwizard.auth.Auth;
 import io.dropwizard.servlets.assets.ResourceNotFoundException;
 
 import javax.validation.Valid;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
@@ -31,6 +32,8 @@ import java.util.List;
 /**
  * @author rwatsh on 9/24/15.
  */
+@Path(EndpointUtils.ENDPOINT_ROOT + "/courses")
+@Produces(MediaType.APPLICATION_JSON)
 public class CourseResource extends BaseResource<Course> {
 
     public CourseResource(DBClient client) {
@@ -38,26 +41,41 @@ public class CourseResource extends BaseResource<Course> {
     }
 
     @Override
-    public Response create(@Auth User user, @Valid Course model, @Context UriInfo info) {
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response create(@Auth User user, @Valid String courseJson, @Context UriInfo info) {
         return null;
     }
 
     @Override
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public List<Course> list(@Auth User user) throws InternalErrorException {
         return null;
     }
 
     @Override
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{id}")
     public Course retrieve(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         return null;
     }
 
     @Override
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/{id}")
     public Course update(@Auth User user, @PathParam("id") String id, @Valid Course entity) throws ResourceNotFoundException, InternalErrorException {
         return null;
     }
 
     @Override
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{id}")
     public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         return null;
     }

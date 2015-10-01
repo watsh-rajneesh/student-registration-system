@@ -47,13 +47,19 @@ public class ModelTest {
 
     @Test
     public void testAdd() throws IOException {
+        // Java test client can use Model objects to create JSON string for passing to webservice.
         User user = new User("test@gmail.com", "test@gmail.com", "John", "Doe", new Role(RoleType.ADMIN) );
         String jsonStr = CommonUtils.convertObjectToJson(user);
         log.info(jsonStr);
+
+        // Convert JSON string to DB Object -- UI to webservice to DB path. So input from UI should be String (JSON).
         DBObject dbObject = (DBObject) JSON.parse(jsonStr);
+        // Since we bypass converting user specified JSON to model objects, we should validate the JSON attributes.
         Key<User> userKey = morphiaDatastore.save(user);
         User savedUser = morphiaDatastore.getByKey(User.class, userKey);
         log.info(dbObject.toString());
+        // Convert Model object to JSON string -- DB returns Model object to web service, convert it to string and return to UI.
+        // So UI always gives and takes string, and DB always gets
         log.info(CommonUtils.convertObjectToJson(savedUser));
 
 

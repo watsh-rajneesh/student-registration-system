@@ -20,8 +20,7 @@ import edu.sjsu.cohort6.esp.service.auth.SimpleAuthenticator;
 import edu.sjsu.cohort6.esp.service.cli.CreateUserCommand;
 import edu.sjsu.cohort6.esp.service.cli.ListUserCommand;
 import edu.sjsu.cohort6.esp.service.health.DBHealthCheck;
-import edu.sjsu.cohort6.esp.service.rest.EndpointUtils;
-import edu.sjsu.cohort6.esp.service.rest.StudentResource;
+import edu.sjsu.cohort6.esp.service.rest.*;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.auth.AuthFactory;
@@ -30,11 +29,6 @@ import io.dropwizard.auth.basic.BasicAuthFactory;
 import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import org.eclipse.jetty.servlets.CrossOriginFilter;
-
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
-import java.util.EnumSet;
 
 /**
  * Created by rwatsh on 9/14/15.
@@ -74,19 +68,13 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
                 User.class))); // backing DB object
 
         environment.healthChecks().register("database", new DBHealthCheck(dbClient));
-        //configureCors(environment);
+        environment.jersey().register(new CORSFilter());
         final StudentResource studentResource = new StudentResource(dbClient);
+        final CourseResource courseResource = new CourseResource(dbClient);
+        final UserResource userResource = new UserResource(dbClient);
         environment.jersey().setUrlPattern(EndpointUtils.ENDPOINT_ROOT + "/*");
         environment.jersey().register(studentResource);
-    }
-
-    private void configureCors(Environment environment) {
-        FilterRegistration.Dynamic filter = environment.servlets().addFilter("CORS", CrossOriginFilter.class);
-        filter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
-        filter.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,PUT,POST,DELETE,OPTIONS");
-        filter.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
-        filter.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
-        filter.setInitParameter("allowedHeaders", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin");
-        filter.setInitParameter("allowCredentials", "true");
+        environment.jersey().register(courseResource);
+        environment.jersey().register(userResource);
     }
 }

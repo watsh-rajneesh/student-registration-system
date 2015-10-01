@@ -51,7 +51,17 @@
         </dependency>
         <dependency>
             <groupId>edu.sjsu.cohort6.esp</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.sjsu.cohort6.esp</groupId>
             <artifactId>database</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.sjsu.cohort6.esp</groupId>
+            <artifactId>database-tests</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

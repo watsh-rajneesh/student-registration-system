@@ -18,7 +18,6 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
-import edu.sjsu.cohort6.esp.common.CommonUtils;
 import edu.sjsu.cohort6.esp.common.Student;
 import edu.sjsu.cohort6.esp.dao.BaseDAO;
 import org.bson.types.ObjectId;
@@ -84,7 +83,7 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
                     .set("courseRefs", s.getCourseRefs())
                     .set("user", s.getUser());
 
-            Query<Student> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(s.getId());
+            Query<Student> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(s.get_id());
             this.update(updateQuery, ops);
         }
     }
@@ -97,7 +96,7 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
         if (studentIdsList != null) {
             for (String id : studentIdsList) {
                 if (id != null) {
-                    id = CommonUtils.sanitizeIdString(id);
+                    //id = CommonUtils.sanitizeIdString(id);
                     objectIds.add(new ObjectId(id));
                 }
             }

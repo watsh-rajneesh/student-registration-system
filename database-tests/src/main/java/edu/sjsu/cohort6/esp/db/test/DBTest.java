@@ -27,6 +27,7 @@ import edu.sjsu.cohort6.esp.dao.mongodb.UserDAO;
 import org.testng.Assert;
 import org.testng.annotations.*;
 
+import java.lang.String;
 import java.lang.reflect.ParameterizedType;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -48,7 +49,7 @@ public abstract class DBTest<T extends BaseDAO, S> {
 
     public String dbName = "testreg";
     private static final Logger log = Logger.getLogger(DBTest.class.getName());
-    protected DBClient client;
+    protected static DBClient client;
     private long startTime;
 
     public DBTest() {
@@ -59,7 +60,9 @@ public abstract class DBTest<T extends BaseDAO, S> {
 
     @BeforeClass
     @Parameters({"server", "port", "dbName"})
-    public void setUp(@Optional("localhost") String server, @Optional("27017") String port, @Optional("testreg") String dbName) throws Exception {
+    public void setUp(@Optional("localhost") String server,
+                      @Optional("27017") String port,
+                      @Optional("testreg") String dbName) throws Exception {
         client = dbFactory.create(server, Integer.parseInt(port), dbName);
 
         this.dbName = dbName;
@@ -113,8 +116,8 @@ public abstract class DBTest<T extends BaseDAO, S> {
      */
 
 
-    protected User testCreateUser() {
-        User user = new User("watsh.rajneesh@sjsu.edu", "watsh.rajneesh@sjsu.edu", "Watsh", "Rajneesh", new Role(RoleType.STUDENT));
+    public static User testCreateUser() {
+        User user = getTestUser();
         UserDAO userDAO = (UserDAO)client.getDAO(UserDAO.class);
         List<User> usersList = new ArrayList<>();
         usersList.add(user);
@@ -126,33 +129,18 @@ public abstract class DBTest<T extends BaseDAO, S> {
         return users.get(0);
     }
 
+    public static User getTestUser() {
+        return new User("watsh.rajneesh@sjsu.edu", "watsh.rajneesh@sjsu.edu", "Watsh", "Rajneesh", new Role(RoleType.STUDENT));
+    }
+
     /**
      * This method is common code between student and course tests so kept in the base class.
      *
      * @return
      * @throws ParseException
      */
-    protected List<String> testCreateCourse() throws ParseException {
-        ArrayList<String> keywords = new ArrayList<String>() {{
-            add("Java");
-            add("MongoDB");
-            add("REST");
-        }};
-        ArrayList<String> instructors = new ArrayList<String>() {{
-            add("Ahmad Nouri");
-            add("Thomas Hildebrand");
-            add("Aktouf");
-        }};
-        Course course = new Course.Builder("Cloud Technologies")
-                .maxCapacity(20)
-                .price(200.0)
-                .availabilityStatus(Course.AvailabilityStatus.AVAILABLE.getValue())
-                .startTime(CommonUtils.getDateFromString("10-10-2015 10:30"))
-                .endTime(CommonUtils.getDateFromString("11-10-2015 13:00"))
-                .instructors(instructors)
-                .location("Santa Clara, CA")
-                .keywords(keywords)
-                .build();
+    public static List<String> testCreateCourse() throws ParseException {
+        Course course = getTestCourse();
         log.info("Course : " + course);
         CourseDAO courseDAO = (CourseDAO)client.getDAO(CourseDAO.class);
         List<String> insertedIds = courseDAO.add(new ArrayList<Course>() {{
@@ -163,5 +151,28 @@ public abstract class DBTest<T extends BaseDAO, S> {
         Assert.assertNotNull(courses);
         log.info("Course created: " + courses);
         return insertedIds;
+    }
+
+    public static Course getTestCourse() throws ParseException {
+        ArrayList<String> keywords = new ArrayList<String>() {{
+            add("Java");
+            add("MongoDB");
+            add("REST");
+        }};
+        ArrayList<String> instructors = new ArrayList<String>() {{
+            add("Ahmad Nouri");
+            add("Thomas Hildebrand");
+            add("Aktouf");
+        }};
+        return new Course.Builder("Cloud Technologies")
+                .maxCapacity(20)
+                .price(200.0)
+                .availabilityStatus(Course.AvailabilityStatus.AVAILABLE.getValue())
+                .startTime(CommonUtils.getDateFromString("10-10-2015 10:30"))
+                .endTime(CommonUtils.getDateFromString("11-10-2015 13:00"))
+                .instructors(instructors)
+                .location("Santa Clara, CA")
+                .keywords(keywords)
+                .build();
     }
 }

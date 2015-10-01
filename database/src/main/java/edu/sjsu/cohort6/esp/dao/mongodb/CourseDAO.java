@@ -81,7 +81,7 @@ public class CourseDAO extends BasicDAO<Course, String> implements BaseDAO<Cours
                             //.set("startDate", course.getStartDate())
                     .set("startTime", course.getStartTime());
 
-            Query<Course> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(course.getId());
+            Query<Course> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(course.get_id());
             this.update(updateQuery, ops);
         }
     }
@@ -117,5 +117,13 @@ public class CourseDAO extends BasicDAO<Course, String> implements BaseDAO<Cours
         }
         return courses;
 
+    }
+
+    public Course fetchCourseByName(String name) {
+        List<Course> courses =  this.fetch("{courseName: \"" + name + "\"}");
+        if (!courses.isEmpty()) {
+            return courses.get(0);
+        }
+        return null;
     }
 }

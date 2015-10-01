@@ -52,7 +52,7 @@ public abstract class BaseResource<T extends BaseModel> {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    abstract public Response create(@Auth User user, @Valid T model, @Context UriInfo info);
+    abstract public Response create(@Auth User user, @Valid String modelJson, @Context UriInfo info);
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

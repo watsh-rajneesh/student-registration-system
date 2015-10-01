@@ -14,21 +14,27 @@
 
 package edu.sjsu.cohort6.esp.service.rest;
 
+import edu.sjsu.cohort6.esp.common.CommonUtils;
+import edu.sjsu.cohort6.esp.common.Course;
 import edu.sjsu.cohort6.esp.common.Student;
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
+import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
 import io.dropwizard.auth.Auth;
 import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.*;
+import javax.ws.rs.*;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -49,21 +55,47 @@ public class StudentResource extends BaseResource<Student> {
 
 
     @Override
-    public Response create(@Auth User user, @Valid Student student, @Context UriInfo info) {
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response create(@Auth User user, @Valid String studentJson, @Context UriInfo info) {
         try {
+            Student s = CommonUtils.convertJsonToObject(studentJson, Student.class);
             List<Student> studentList = new ArrayList<>();
-            studentList.add(student);
-            List<String> studentIds = studentDAO.add(studentList);
-            return Response.created(UriBuilder.fromResource(getClass())
-                    .build(student, studentIds.get(0)))
-                    .build();
+            studentList.add(s);
+            createUserForStudent(s);
+            findCoursesForStudent(s);
+            studentDAO.add(studentList);
+                return Response.ok()
+                        .entity(Entity.json(s))
+                        .build();
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException();
+            log.log(Level.SEVERE, "Error in adding student", e);
+            throw new BadRequestException();
         }
     }
 
+    public void findCoursesForStudent(Student s) {
+        List<Course> courses = s.getCourseRefs();
+        if (courses != null && !courses.isEmpty()) {
+            // find course by name
+            for (Course course : courses) {
+                Course c = courseDAO.fetchCourseByName(course.getCourseName());
+                course.set_id(c.get_id());
+            }
+        }
+    }
+
+    public void createUserForStudent(Student s) {
+        User u = s.getUser();
+        List<User> userList = new ArrayList<>();
+        userList.add(u);
+        userDAO.add(userList);
+    }
+
     @Override
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public List list(@Auth User user) {
         List<String> studentIds = new ArrayList<>();
         List<Student> studentList = studentDAO.fetchById(studentIds);
@@ -71,6 +103,9 @@ public class StudentResource extends BaseResource<Student> {
     }
 
     @Override
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{id}")
     public Student retrieve(@Auth User user, @PathParam("id") String studentId) throws ResourceNotFoundException {
         List<String> studentIds = getStudentIdsList(studentId);
         List<Student> studentList = studentDAO.fetchById(studentIds);
@@ -104,8 +139,12 @@ public class StudentResource extends BaseResource<Student> {
     }
 
     @Override
+    @PUT
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/{id}")
     public Student update(@Auth User user, @PathParam("id") String id, @Valid Student student) throws ResourceNotFoundException {
-        student.setId(new ObjectId(id));
+        student.set_id(new ObjectId(id));
         try {
             studentDAO.update(getStudentsList(student));
             List<Student> studentList = studentDAO.fetchById(getStudentIdsList(id));
@@ -119,6 +158,9 @@ public class StudentResource extends BaseResource<Student> {
     }
 
     @Override
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{id}")
     public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException {
         try {
             studentDAO.remove(getStudentIdsList(id));

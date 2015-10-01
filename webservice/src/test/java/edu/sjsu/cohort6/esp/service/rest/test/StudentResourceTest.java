@@ -15,7 +15,10 @@
 package edu.sjsu.cohort6.esp.service.rest.test;
 
 import edu.sjsu.cohort6.esp.common.CommonUtils;
+import edu.sjsu.cohort6.esp.common.Course;
 import edu.sjsu.cohort6.esp.common.Student;
+import edu.sjsu.cohort6.esp.common.User;
+import edu.sjsu.cohort6.esp.db.test.DBTest;
 import edu.sjsu.cohort6.esp.service.rest.EndpointUtils;
 import org.bson.types.ObjectId;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
@@ -27,6 +30,7 @@ import org.testng.annotations.Test;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -39,7 +43,7 @@ import java.util.logging.Logger;
  */
 public class StudentResourceTest {
 
-    public static final String BASE_URI = "http://localhost:9999";
+    public static final String BASE_URI = "http://localhost:8080";
     public static final String STUDENT_RESOURCE_URI = EndpointUtils.ENDPOINT_ROOT + "/students";
     private Client client;
     private WebTarget webTarget;
@@ -49,7 +53,7 @@ public class StudentResourceTest {
     public void setUp() throws Exception {
         client = ClientBuilder.newClient();
         HttpAuthenticationFeature feature = HttpAuthenticationFeature
-                .basic("watsh.rajneesh@sjsu.edu", "6a00b426-1243-4d80-a059-a1973e3482fe");
+                .basic("watsh.rajneesh@sjsu.edu", "7ce278cd-f6ae-4173-9a1d-1aa7b9879c26");
         client.register(feature);
         webTarget = client.target(BASE_URI);
     }
@@ -83,7 +87,7 @@ public class StudentResourceTest {
     public void testGetStudent() throws Exception {
         List<Student> studentList = getStudents();
         if (studentList != null && !studentList.isEmpty()) {
-            ObjectId id = studentList.get(0).getId();
+            ObjectId id = studentList.get(0).get_id();
 
             Response response = webTarget.path(STUDENT_RESOURCE_URI)
                     .queryParam("id", id.toHexString())
@@ -107,14 +111,28 @@ public class StudentResourceTest {
 
     private Student createStudent() throws Exception {
         Student s = new Student();
+        User user = DBTest.getTestUser();
+        s.setUser(user);
+        Course c = DBTest.getTestCourse();
+        List<Course> courses = new ArrayList<>();
+        //courses.add(c);
+        s.setCourseRefs(courses);
+
+        // Convert to string
+        String studentJson = CommonUtils.convertObjectToJson(s);
+        log.info(studentJson);
+
+        // Use json string to web service.
+
         Invocation.Builder invocationBuilder = webTarget.path(STUDENT_RESOURCE_URI)
                 .request().accept(MediaType.APPLICATION_JSON_TYPE).header("content-type", MediaType.APPLICATION_JSON);
 
-        Response response = invocationBuilder.post(Entity.entity(s, MediaType.APPLICATION_JSON_TYPE));
+        Response response = invocationBuilder.post(Entity.json(studentJson));
 
         log.info(response.toString());
-        s = response.readEntity(Student.class);
-        //Student student = CommonUtils.convertJsonToObject(respStr, Student.class);
+        Student student = response.readEntity(Student.class);
+
+        //Student student = CommonUtils.convertJsonToObject(respJson, Student.class);
         log.info(s.toString());
         Assert.assertTrue(response.getStatus() == Response.Status.OK.getStatusCode());
         return s;

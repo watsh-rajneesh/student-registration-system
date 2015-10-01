@@ -14,6 +14,7 @@
 
 package edu.sjsu.cohort6.esp.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
@@ -50,15 +51,16 @@ import java.util.logging.Logger;
  *
  * @author rwatsh
  */
-@Entity("course")
-@Indexes(
-        @Index(value = "courseName", fields = @Field("courseName"))
-)
+@Entity(value = "course" , noClassnameStored = true, concern = "SAFE")
+@JsonIgnoreProperties({"_id"})
 public class Course extends BaseModel {
     @Id
-    private ObjectId id;
+    private ObjectId _id;
 
-    @Indexed(name = "courseName", unique = true, dropDups = true)
+    @Transient
+    private String id;
+
+    @Indexed(unique = true)
     private String courseName;
     private List<String> instructors;
     private Date startTime;
@@ -159,13 +161,12 @@ public class Course extends BaseModel {
         //this.studentRefs = b.studentRefs;
     }
 
-    @JsonProperty
-    public ObjectId getId() {
-        return id;
+    public ObjectId get_id() {
+        return _id;
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
+    public void set_id(ObjectId id) {
+        this._id = id;
     }
 
 
@@ -259,7 +260,18 @@ public class Course extends BaseModel {
         this.keywords = keywords;
     }
 
-    /*public List<Student> getStudentRefs() {
+    @JsonProperty
+    public String getId() {
+        return _id != null ? _id.toHexString() : null;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        this._id = new ObjectId(id);
+    }
+
+
+/*public List<Student> getStudentRefs() {
         return studentRefs;
     }
 
@@ -270,7 +282,7 @@ public class Course extends BaseModel {
     @Override
     public String toString() {
         return "Course{" +
-                "id=" + (id != null ? id.toHexString() : "") +
+                "id=" + (_id != null ? _id.toHexString() : "") +
                 ", courseName='" + courseName + '\'' +
                 ", instructors=" + instructors +
                 ", startTime=" + startTime +

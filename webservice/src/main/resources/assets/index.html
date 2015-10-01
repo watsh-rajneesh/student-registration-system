@@ -23,8 +23,8 @@
     <ul class="list group">
         <li class="list group item" ng-repeat="student in s.students">
             <h3>
-                {{student.firstName}} {{student.lastName}}
-                <em class="pull-right">{{student.emailId}}</em>
+                {{student.user.firstName}} {{student.user.lastName}}
+                <em class="pull-right">{{student.user.emailId}}</em>
             </h3>
         </li>
     </ul>

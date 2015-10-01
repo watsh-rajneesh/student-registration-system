@@ -14,8 +14,10 @@
 
 package edu.sjsu.cohort6.esp.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.types.ObjectId;
+import org.hibernate.validator.constraints.Email;
 import org.mongodb.morphia.annotations.*;
 
 import javax.validation.constraints.NotNull;
@@ -43,17 +45,18 @@ import java.util.Date;
  *
  * @author rwatsh on 9/23/15.
  */
-@Entity("user")
-@Indexes(value = {
-        @Index(value = "emailId", fields = @Field("emailId")),
-        @Index(value = "userName", fields = @Field("userName"))
-})
+@Entity(value = "course" , noClassnameStored = true, concern = "SAFE")
+@JsonIgnoreProperties({"_id"})
 public class User extends BaseModel {
     @Id
-    private ObjectId id;
+    private ObjectId _id;
 
-    @Indexed(name = "emailId", unique = true, dropDups = true)
+    @Transient
+    private String id;
+
+    @Indexed(unique = true)
     @NotNull
+    @Email
     private String emailId;
     @NotNull
     private String userName;
@@ -91,13 +94,12 @@ public class User extends BaseModel {
         }
     }
 
-    @JsonProperty("_id")
-    public ObjectId getId() {
-        return id;
+    public ObjectId get_id() {
+        return _id;
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
+    public void set_id(ObjectId id) {
+        this._id = id;
     }
 
 
@@ -164,10 +166,20 @@ public class User extends BaseModel {
         this.role = role;
     }
 
+    @JsonProperty
+    public String getId() {
+        return _id != null ? _id.toHexString() : null;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+        this._id = new ObjectId(id);
+    }
+
     @Override
     public String toString() {
         return "User{" +
-                "id=" + (id != null ? id.toHexString() : "") +
+                "id=" + (_id != null ? _id.toHexString() : "") +
                 ", emailId='" + emailId + '\'' +
                 ", userName='" + userName + '\'' +
                 ", token='" + token + '\'' +
