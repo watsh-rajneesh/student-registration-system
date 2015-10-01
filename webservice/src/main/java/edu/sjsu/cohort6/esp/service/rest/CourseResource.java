@@ -14,18 +14,24 @@
 
 package edu.sjsu.cohort6.esp.service.rest;
 
+import edu.sjsu.cohort6.esp.common.CommonUtils;
 import edu.sjsu.cohort6.esp.common.Course;
 import edu.sjsu.cohort6.esp.dao.DBClient;
+import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import io.dropwizard.servlets.assets.ResourceNotFoundException;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author rwatsh on 9/24/15.
@@ -33,6 +39,8 @@ import java.util.List;
 @Path(EndpointUtils.ENDPOINT_ROOT + "/courses")
 @Produces(MediaType.APPLICATION_JSON)
 public class CourseResource extends BaseResource<Course> {
+
+    private static final Logger log = Logger.getLogger(Course.class.getName());
 
     public CourseResource(DBClient client) {
         super(client);
@@ -43,7 +51,19 @@ public class CourseResource extends BaseResource<Course> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(/*@Auth User user,*/ @Valid String courseJson, @Context UriInfo info) {
-        return null;
+        try {
+            Course c = CommonUtils.convertJsonToObject(courseJson, Course.class);
+            List<Course> courseList = new ArrayList<>();
+            courseList.add(c);
+            courseDAO.add(courseList);
+            return Response.ok()
+                    .entity(Entity.json(c))
+                    .build();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Error in adding course", e);
+            throw new BadRequestException();
+        }
+
     }
 
     @Override

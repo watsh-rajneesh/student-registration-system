@@ -76,12 +76,17 @@ public class StudentResource extends BaseResource<Student> {
 
     public void findCoursesForStudent(Student s) {
         List<Course> courses = s.getCourseRefs();
+        List<Course> coursesFoundList = new ArrayList<>();
         if (courses != null && !courses.isEmpty()) {
             // find course by name
             for (Course course : courses) {
-                courseDAO.fetchCourseByName(course.getCourseName());
+                Course c =  courseDAO.fetchCourseByName(course.getCourseName());
+                if (c != null) {
+                    coursesFoundList.add(c);
+                }
             }
         }
+        s.setCourseRefs(coursesFoundList);
     }
 
     public void createUserForStudent(Student s) {

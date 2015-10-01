@@ -21,6 +21,7 @@ import com.mongodb.util.JSON;
 import edu.sjsu.cohort6.esp.common.Course;
 import edu.sjsu.cohort6.esp.dao.BaseDAO;
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.Key;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.dao.BasicDAO;
 import org.mongodb.morphia.mapping.Mapper;
@@ -46,11 +47,14 @@ public class CourseDAO extends BasicDAO<Course, String> implements BaseDAO<Cours
     }
 
     @Override
-    public List<String> add(List<Course> courseList) {
+    public List<String> add(List<Course> entityList) {
         //morphiaDatastore.save(courseList);
         List<String> insertedIds = new ArrayList<>();
-        for (Course course: courseList) {
-            insertedIds.add(((ObjectId) this.save(course).getId()).toString());
+        if (entityList != null) {
+            for (Course course: entityList) {
+                Key<Course> key = this.save(course);
+                insertedIds.add(key.getId().toString());
+            }
         }
         return insertedIds;
     }

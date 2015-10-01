@@ -21,11 +21,10 @@ import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.db.test.DBTest;
 import edu.sjsu.cohort6.esp.service.rest.EndpointUtils;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.client.*;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -39,32 +38,13 @@ import java.util.logging.Logger;
  * <p>
  * for more on the Jersey client APIs.
  */
-public class StudentResourceTest {
+public class StudentResourceTest extends BaseResourceTest {
 
-    public static final String BASE_URI = "http://localhost:8080";
     public static final String STUDENT_RESOURCE_URI = EndpointUtils.ENDPOINT_ROOT + "/students";
-    private Client client;
-    private WebTarget webTarget;
     private static final Logger log = Logger.getLogger(StudentResourceTest.class.getName());
 
-    @BeforeClass
-    public void setUp() throws Exception {
-        client = ClientBuilder.newClient();
-        /*HttpAuthenticationFeature feature = HttpAuthenticationFeature
-                .basic("nilay.kothari@sjsu.edu", "56cdf9a7-0f75-490f-88cf-03d7f57cb9b8");
-        client.register(feature);*/
-        webTarget = client.target(BASE_URI);
-    }
-
-    @AfterClass
-    public void tearDown() throws Exception {
-        if (client != null) {
-            client.close();
-        }
-    }
-
     @Test
-    public void testGetStudents() throws Exception {
+    public void testFetchAll() throws Exception {
         List<Student> studentList  = getStudents();
         Assert.assertNotNull(studentList);
     }
@@ -82,7 +62,7 @@ public class StudentResourceTest {
     }
 
     @Test
-    public void testGetStudent() throws Exception {
+    public void testFetch() throws Exception {
         List<Student> studentList = getStudents();
         if (studentList != null && !studentList.isEmpty()) {
             String id = studentList.get(0).getId();
@@ -102,9 +82,19 @@ public class StudentResourceTest {
 
 
     @Test
-    public void testCreateStudent() throws Exception {
+    public void testAdd() throws Exception {
         Student s = createStudent();
         Assert.assertNotNull(s);
+    }
+
+    @Override
+    public void testRemove() throws Exception {
+
+    }
+
+    @Override
+    public void testUpdate() throws Exception {
+
     }
 
     private Student createStudent() throws Exception {
@@ -114,6 +104,7 @@ public class StudentResourceTest {
         Course c = DBTest.getTestCourse();
         List<Course> courses = new ArrayList<>();
         courses.add(c);
+
         s.setCourseRefs(courses);
 
         // Convert to string
@@ -135,5 +126,7 @@ public class StudentResourceTest {
         Assert.assertTrue(response.getStatus() == Response.Status.OK.getStatusCode());
         return s;
     }
+
+
 
 }

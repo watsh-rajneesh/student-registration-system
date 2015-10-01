@@ -130,7 +130,7 @@ public abstract class DBTest<T extends BaseDAO, S> {
     }
 
     public static User getTestUser() {
-        return new User("watsh.rajneesh@sjsu.edu", "watsh.rajneesh@sjsu.edu", "Watsh", "Rajneesh", new Role(RoleType.STUDENT));
+        return new User("john.doe@sjsu.edu", "john.doe@sjsu.edu", "John", "Doe", new Role(RoleType.STUDENT));
     }
 
     /**
