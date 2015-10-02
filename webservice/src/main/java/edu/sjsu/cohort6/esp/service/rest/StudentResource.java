@@ -63,7 +63,7 @@ public class StudentResource extends BaseResource<Student> {
             createUserForStudent(s);
             findCoursesForStudent(s);
             studentDAO.add(studentList);
-            URI uri = UriBuilder.fromResource(UserResource.class).build(s.getId());
+            URI uri = UriBuilder.fromResource(StudentResource.class).build(s.getId());
             return Response.created(uri)
                         .entity(Entity.json(s))
                         .build();
