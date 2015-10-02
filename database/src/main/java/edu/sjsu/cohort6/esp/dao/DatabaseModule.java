@@ -21,6 +21,9 @@ import edu.sjsu.cohort6.esp.dao.mongodb.MongoDBClient;
 /**
  * Setup Guice bindings.
  *
+ * This configures Guice to create a factory implementation at runtime that will implement the create method of DBFactory
+ * interface to create an instance of MongoDBClient.
+ *
  * @author rwatsh
  */
 public class DatabaseModule extends AbstractModule {

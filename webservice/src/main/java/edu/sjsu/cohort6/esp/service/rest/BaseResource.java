@@ -47,6 +47,18 @@ public abstract class BaseResource<T extends BaseModel> {
         this.courseDAO = (CourseDAO) client.getDAO(CourseDAO.class);
     }
 
+    /*
+     * Note: It is important to also define the @POST, @GET... etc annotations with the implementation methods in the
+     * derived classes or else they will not be accounted for by dropwizard framework.
+     */
+
+    /**
+     * Create the resource.
+     *
+     * @param modelJson
+     * @param info
+     * @return
+     */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)

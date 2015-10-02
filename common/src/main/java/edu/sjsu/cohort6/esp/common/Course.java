@@ -55,6 +55,14 @@ import java.util.logging.Logger;
  */
 @Entity(value = "courses" , noClassnameStored = true, concern = "SAFE")
 public class Course extends BaseModel {
+    /**
+     * Note:
+     * It is important to initialize the id with ObjectID hex string to avoid any errors in JSON to DBObject (BSON)
+     * conversion or Java object to JSON response conversion. This is the hard learned way to make this work after
+     * having tried several frameworks like mongojack, katharisis to make morphia and dropwizard work together. This
+     * simple solution to maintain the id as hex string of the object ID works pretty well between jersey, jackson, and
+     * mongodb/morphia frameworks.
+     */
     @Id
     private String id = new ObjectId().toHexString();
 
