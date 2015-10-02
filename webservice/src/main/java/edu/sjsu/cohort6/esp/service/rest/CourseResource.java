@@ -19,15 +19,14 @@ import edu.sjsu.cohort6.esp.common.Course;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
-import io.dropwizard.servlets.assets.ResourceNotFoundException;
+import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
+import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -56,7 +55,8 @@ public class CourseResource extends BaseResource<Course> {
             List<Course> courseList = new ArrayList<>();
             courseList.add(c);
             courseDAO.add(courseList);
-            return Response.ok()
+            URI uri = UriBuilder.fromResource(CourseResource.class).build(c.getId());
+            return Response.created(uri)
                     .entity(Entity.json(c))
                     .build();
         } catch (Exception e) {
@@ -70,7 +70,9 @@ public class CourseResource extends BaseResource<Course> {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Course> list(/*@Auth User user*/) throws InternalErrorException {
-        return null;
+        List<String> courseIds = new ArrayList<>();
+        List<Course> courseList = courseDAO.fetchById(courseIds);
+        return courseList;
     }
 
     @Override
@@ -78,7 +80,13 @@ public class CourseResource extends BaseResource<Course> {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public Course retrieve(/*@Auth User user,*/ @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
-        return null;
+        List<String> courseIdList = getListFromEntityId(id);
+        List<Course> courseList = courseDAO.fetchById(courseIdList);
+        if (courseList != null && !courseList.isEmpty()) {
+            return courseList.get(0);
+        } else {
+            throw new ResourceNotFoundException();
+        }
     }
 
     @Override
@@ -87,7 +95,17 @@ public class CourseResource extends BaseResource<Course> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public Course update(/*@Auth User user,*/ @PathParam("id") String id, @Valid Course entity) throws ResourceNotFoundException, InternalErrorException {
-        return null;
+        entity.setId(new ObjectId(id).toString());
+        try {
+            courseDAO.update(getListFromEntity(entity));
+            List<Course> courseList = courseDAO.fetchById(getListFromEntityId(id));
+            if (courseList != null && !courseList.isEmpty()) {
+                return courseList.get(0);
+            }
+            throw new ResourceNotFoundException();
+        } catch (Exception e) {
+            throw new InternalErrorException(e);
+        }
     }
 
     @Override
@@ -95,6 +113,11 @@ public class CourseResource extends BaseResource<Course> {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public Response delete(/*@Auth User user,*/ @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
-        return null;
+        try {
+            courseDAO.remove(getListFromEntityId(id));
+            return Response.ok().build();
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
     }
 }

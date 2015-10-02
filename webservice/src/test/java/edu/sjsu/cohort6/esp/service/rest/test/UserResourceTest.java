@@ -15,7 +15,7 @@
 package edu.sjsu.cohort6.esp.service.rest.test;
 
 import edu.sjsu.cohort6.esp.common.CommonUtils;
-import edu.sjsu.cohort6.esp.common.Course;
+import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.db.test.DBTest;
 import edu.sjsu.cohort6.esp.service.rest.EndpointUtils;
 import org.testng.Assert;
@@ -28,39 +28,45 @@ import java.util.logging.Logger;
 /**
  * @author rwatsh on 10/1/15.
  */
-public class CourseResourceTest extends BaseResourceTest {
-    public static final String RESOURCE_URI = EndpointUtils.ENDPOINT_ROOT + "/courses";
+public class UserResourceTest extends BaseResourceTest {
+
+    public static final String RESOURCE_URI = EndpointUtils.ENDPOINT_ROOT + "/users";
     private static final Logger log = Logger.getLogger(StudentResourceTest.class.getName());
 
-
-
-    private Course createCourse(Course course) throws Exception {
+    private User createUser(User user) throws Exception {
         // Convert to string
-        String jsonStr = CommonUtils.convertObjectToJson(course);
+        String jsonStr = CommonUtils.convertObjectToJson(user);
         log.info(jsonStr);
         Response response = webTarget.path(RESOURCE_URI)
                 .request()
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .header("content-type", MediaType.APPLICATION_JSON)
                 .post(Entity.json(jsonStr));
-
+        //String us = response.readEntity(String.class);
+        User u = CommonUtils.convertJsonToObject(response, User.class);
+        log.info(u.toString());
         Assert.assertTrue(response.getStatus() == Response.Status.CREATED.getStatusCode());
-        Course c1 = CommonUtils.convertJsonToObject(response, Course.class);
-        log.info(c1.toString());
-        return c1;
+        return u;
     }
-
-
 
     @Override
     public void testAdd() throws Exception {
-        Course c = createCourse(DBTest.getTestCourse());
-        Assert.assertNotNull(c);
+        User user = createUser(DBTest.getTestUser());
+        Assert.assertNotNull(user);
     }
 
     @Override
     public void testRemove() throws Exception {
-
+        User user = createUser(DBTest.getTestUser());
+        log.info("Created user: " + user);
+        Response response = webTarget.path(RESOURCE_URI)
+                .path("/" + user.getId())
+                .request()
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .header("content-type", MediaType.APPLICATION_JSON)
+                .delete();
+        Assert.assertTrue(response.getStatus() == Response.Status.OK.getStatusCode());
+        log.info("User deleted: " + user);
     }
 
     @Override

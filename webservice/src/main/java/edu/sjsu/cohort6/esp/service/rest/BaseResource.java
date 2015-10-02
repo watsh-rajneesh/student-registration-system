@@ -28,6 +28,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -87,5 +88,30 @@ public abstract class BaseResource<T extends BaseModel> {
     abstract public Response delete(/*@Auth User user,*/ @PathParam("id") String id)
             throws ResourceNotFoundException, InternalErrorException;
 
+    /**
+     * Common methods
+     */
+
+    protected List<String> getListFromEntityId(String entityId) {
+        List<String> entityIdsList = new ArrayList<>();
+
+        if (entityId != null && !entityId.isEmpty()) {
+            entityIdsList.add(entityId);
+        } else {
+            entityIdsList = null;
+        }
+        return entityIdsList;
+    }
+
+    protected List<T> getListFromEntity(T entity) {
+        List<T> entitiesList = new ArrayList<>();
+
+        if (entity != null) {
+            entitiesList.add(entity);
+        } else {
+            entitiesList = null;
+        }
+        return entitiesList;
+    }
 }
 

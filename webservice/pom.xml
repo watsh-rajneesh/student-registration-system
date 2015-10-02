@@ -49,6 +49,7 @@
             <artifactId>dropwizard-auth</artifactId>
             <version>${dropwizard.version}</version>
         </dependency>
+
         <dependency>
             <groupId>edu.sjsu.cohort6.esp</groupId>
             <artifactId>common</artifactId>

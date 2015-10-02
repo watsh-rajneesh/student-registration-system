@@ -16,7 +16,10 @@ package edu.sjsu.cohort6.esp.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -25,12 +28,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by rwatsh on 9/22/15.
  */
 public class CommonUtils {
 
+    private static final Logger log = Logger.getLogger(CommonUtils.class.getName());
     /**
      * Converts a JSON array of objects to List of Java Object types.
      * For example, convert a JSON array of students to List<Student>.
@@ -43,7 +48,7 @@ public class CommonUtils {
      */
     public static <T> List<T> convertJsonArrayToList(String jsonArrayStr, Class<T> clazz) throws java.io.IOException {
         ObjectMapper mapper = new ObjectMapper();
-        jsonArrayStr = removeIdField(jsonArrayStr);
+        //jsonArrayStr = removeIdField(jsonArrayStr);
         return mapper.readValue(jsonArrayStr,
                 TypeFactory.defaultInstance().constructCollectionType(List.class, clazz));
     }
@@ -64,8 +69,22 @@ public class CommonUtils {
      */
     public static <T> T convertJsonToObject(String jsonStr, Class<T> clazz) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        jsonStr = removeIdField(jsonStr);
+        //jsonStr = removeIdField(jsonStr);
         return mapper.readValue(jsonStr, clazz);
+    }
+
+    public static <T> T convertJsonToObject(Response response, Class<T> clazz) throws IOException, org.json.simple.parser.ParseException {
+        String json = getJsonFromResponse(response);
+        return convertJsonToObject(json, clazz);
+    }
+
+    private static String getJsonFromResponse(Response response) throws org.json.simple.parser.ParseException {
+        String c = response.readEntity(String.class);
+        log.info(c.toString());
+        JSONParser parser=new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(c);
+        JSONObject jsonObject = (JSONObject) json.get("entity");
+        return jsonObject.toJSONString();
     }
 
     /**

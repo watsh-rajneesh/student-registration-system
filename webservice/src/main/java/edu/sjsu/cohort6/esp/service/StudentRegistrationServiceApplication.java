@@ -56,16 +56,32 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
     @Override
     public void run(StudentRegistrationServiceConfiguration studentRegistrationServiceConfiguration, Environment environment) throws Exception {
         dbClient = studentRegistrationServiceConfiguration.getDbConfig().build(environment);
+
+        /*
+         * Setup basic authentication against DB table.
+         */
         //Authenticator<BasicCredentials, User> simpleAuthenticator = new SimpleAuthenticator(dbClient);
         /*environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<User>(simpleAuthenticator,
                 "studentreg", // realm name
                 User.class))); // backing DB object*/
 
         environment.healthChecks().register("database", new DBHealthCheck(dbClient));
+
+        /*
+         * TODO: check - Setup CORS filter (may not be needed?)
+         */
         environment.jersey().register(new CORSFilter());
+
+        /*
+         * Register resources with jersey.
+         */
         final StudentResource studentResource = new StudentResource(dbClient);
         final CourseResource courseResource = new CourseResource(dbClient);
         final UserResource userResource = new UserResource(dbClient);
+
+        /*
+         * Setup jersey environment.
+         */
         environment.jersey().setUrlPattern(EndpointUtils.ENDPOINT_ROOT + "/*");
         environment.jersey().register(studentResource);
         environment.jersey().register(courseResource);

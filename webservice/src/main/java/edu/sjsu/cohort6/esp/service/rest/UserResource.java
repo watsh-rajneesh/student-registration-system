@@ -14,18 +14,23 @@
 
 package edu.sjsu.cohort6.esp.service.rest;
 
+import edu.sjsu.cohort6.esp.common.CommonUtils;
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
+import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
-import io.dropwizard.servlets.assets.ResourceNotFoundException;
+import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
+import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.*;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author rwatsh on 9/24/15.
@@ -33,6 +38,8 @@ import java.util.List;
 @Path(EndpointUtils.ENDPOINT_ROOT + "/users")
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource extends BaseResource<User> {
+
+    private static final Logger log = Logger.getLogger(UserResource.class.getName());
 
     public UserResource(DBClient client) {
         super(client);
@@ -43,14 +50,28 @@ public class UserResource extends BaseResource<User> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(/*@Auth User user,*/ @Valid String userJson, @Context UriInfo info) {
-        return null;
+        try {
+            User user = CommonUtils.convertJsonToObject(userJson, User.class);
+            List<User> userList = new ArrayList<>();
+            userList.add(user);
+            userDAO.add(userList);
+            URI uri = UriBuilder.fromResource(UserResource.class).build(user.getId());
+            return Response.created(uri)
+                    .entity(Entity.json(user))
+                    .build();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Error in adding user", e);
+            throw new BadRequestException();
+        }
     }
 
     @Override
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List list(/*@Auth User user*/) throws InternalErrorException {
-        return null;
+        List<String> userIds = new ArrayList<>();
+        List<User> userList = userDAO.fetchById(userIds);
+        return userList;
     }
 
     @Override
@@ -58,7 +79,13 @@ public class UserResource extends BaseResource<User> {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public User retrieve(/*@Auth User user,*/ @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
-        return null;
+        List<String> userIdList = getListFromEntityId(id);
+        List<User> userList = userDAO.fetchById(userIdList);
+        if (userList != null && !userList.isEmpty()) {
+            return userList.get(0);
+        } else {
+            throw new ResourceNotFoundException();
+        }
     }
 
     @Override
@@ -67,7 +94,17 @@ public class UserResource extends BaseResource<User> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public User update(/*@Auth User user,*/ @PathParam("id") String id, @Valid User entity) throws ResourceNotFoundException, InternalErrorException {
-        return null;
+        entity.setId(new ObjectId(id).toString());
+        try {
+            userDAO.update(getListFromEntity(entity));
+            List<User> userList = userDAO.fetchById(getListFromEntityId(id));
+            if (userList != null && !userList.isEmpty()) {
+                return userList.get(0);
+            }
+            throw new ResourceNotFoundException();
+        } catch (Exception e) {
+            throw new InternalErrorException(e);
+        }
     }
 
     @Override
@@ -75,6 +112,11 @@ public class UserResource extends BaseResource<User> {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public Response delete(/*@Auth User user, */@PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
-        return null;
+        try {
+            userDAO.remove(getListFromEntityId(id));
+            return Response.ok().build();
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
     }
 }

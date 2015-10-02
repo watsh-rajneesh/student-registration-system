@@ -119,11 +119,11 @@ public class StudentResourceTest extends BaseResourceTest {
         Response response = invocationBuilder.post(Entity.json(studentJson));
 
         log.info(response.toString());
-        Student student = response.readEntity(Student.class);
+        //String studentStr = response.readEntity(String.class);
 
-        //Student student = CommonUtils.convertJsonToObject(respJson, Student.class);
+        Student student = CommonUtils.convertJsonToObject(response, Student.class);
         log.info(s.toString());
-        Assert.assertTrue(response.getStatus() == Response.Status.OK.getStatusCode());
+        Assert.assertTrue(response.getStatus() == Response.Status.CREATED.getStatusCode());
         return s;
     }
 
