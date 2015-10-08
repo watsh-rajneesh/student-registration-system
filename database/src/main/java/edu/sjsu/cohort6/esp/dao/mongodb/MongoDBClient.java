@@ -43,7 +43,7 @@ public class MongoDBClient implements DBClient {
     private final String dbName;
     private CourseDAO courseDAO;
     private Morphia morphia = null;
-    private static MongoDBClient instance = null;
+    //private static MongoDBClient instance = null;
     private MongoClient mongoClient;
     private Datastore morphiaDatastore;
     private StudentDAO studentDAO;
@@ -93,6 +93,7 @@ public class MongoDBClient implements DBClient {
         morphia = new Morphia();
         morphia.mapPackageFromClass(Student.class);
         morphiaDatastore = morphia.createDatastore(mongoClient, dbName);
+        morphiaDatastore.ensureIndexes();
         studentDAO = new StudentDAO(mongoClient, morphia, dbName);
         courseDAO = new CourseDAO(mongoClient, morphia, dbName);
         userDAO = new UserDAO(mongoClient, morphia, dbName);
@@ -106,6 +107,7 @@ public class MongoDBClient implements DBClient {
     @Override
     public void useDB(String dbName) {
         morphiaDatastore = morphia.createDatastore(mongoClient, dbName);
+        morphiaDatastore.ensureIndexes();
     }
 
     @Override

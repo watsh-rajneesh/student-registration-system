@@ -26,9 +26,9 @@ from requests.auth import HTTPBasicAuth
 """
 Global Constants
 """
-PASSWORD = 'secret'
+PASSWORD = '6a00b426-1243-4d80-a059-a1973e3482fe'
 USER = 'watsh.rajneesh@sjsu.edu'
-HTTPS = '6a00b426-1243-4d80-a059-a1973e3482fe'
+HTTPS = 'false'
 
 
 def replace_value_with_definition(current_dict, key_to_find, definition):
@@ -48,7 +48,7 @@ def replace_value_with_definition(current_dict, key_to_find, definition):
 
 def get_http_scheme():
     """
-    Gets the http/https protocol scheme prefix for url.
+    Gets the http/https protocol scheme prefix for url.w
     :return:
     """
     if HTTPS.lower() == 'true':
@@ -152,9 +152,21 @@ def list_student(hostPort, id):
     url = "%s://%s/api/v1.0/students/%s" % (get_http_scheme(), hostPort, id)
     return get_request(url)
 
-
+def create_student(hostPort, payload):
+    if payload is None:
+        print("Please specify the json file with -f option")
+        sys.exit(1)
+    url = "%s://%s/api/v1.0/students" % (get_http_scheme(), hostPort)
+    return post_request(url, payload)
 
 ################################ MAIN ############################################
+
+
+
+def create_course(hostPort, payload):
+    pass
+
+
 def main():
     parser = argparse.ArgumentParser(description=textwrap.dedent('''\
             !!!Student Registration System!!!
@@ -203,6 +215,7 @@ def main():
 
     command = args.command
     hostPort = args.endpoint
+    payload = None
     if args.file is not None:
         with open(args.file, 'r') as myFile:
             payload = eval(myFile.read())
@@ -221,6 +234,12 @@ def main():
 
     if command == "list-students":
         list_students(hostPort)
+    elif command == "list-student":
+        list_student(hostPort, id=args.id)
+    elif command == "create-student":
+        create_student(hostPort, payload)
+    elif command == "create-course":
+        create_course(hostPort, payload)
 
 
 if __name__ == '__main__':

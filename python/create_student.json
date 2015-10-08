@@ -1,0 +1,39 @@
+{
+  "id": "",
+  "user": {
+    "id": "",
+    "emailId": "nick.doe@sjsu.edu",
+    "userName": "nick.doe@sjsu.edu",
+    "token": "562e893e-5d79-47b9-b925-623f4791e95f",
+    "firstName": "Nick",
+    "lastName": "Dude",
+    "role": {
+      "role": "STUDENT"
+    },
+    "lastUpdated": 1443903418391
+  },
+  "courseRefs": [
+    {
+      "id": "",
+      "courseName": "Cloud Technologies",
+      "instructors": [
+        "Ahmad Nouri",
+        "Thomas Hildebrand",
+        "Aktouf"
+      ],
+      "startTime": 1444498200000,
+      "endTime": 1447189200000,
+      "availabilityStatus": 1,
+      "maxCapacity": 20,
+      "price": 200.0,
+      "location": "Santa Clara, CA",
+      "keywords": [
+        "Java",
+        "MongoDB",
+        "REST"
+      ],
+      "lastUpdated": 1443903418417
+    }
+  ],
+  "lastUpdated": 1443903418389
+}

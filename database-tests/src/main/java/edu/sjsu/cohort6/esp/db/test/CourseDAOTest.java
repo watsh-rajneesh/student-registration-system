@@ -98,6 +98,7 @@ public class CourseDAOTest extends DBTest<CourseDAO, Course> {
     public void testFetchParametrized(String query, int expectedCount) throws ParseException {
         testCreateCourse();
         List<Course> courses = dao.fetch(query);
+        log.info(courses.toString());
         Assert.assertTrue(courses.size() >= expectedCount,
                 MessageFormat.format("Test failed for query: {0}, found records [{1}], expected count {2}", query, courses.size(), expectedCount));
     }
