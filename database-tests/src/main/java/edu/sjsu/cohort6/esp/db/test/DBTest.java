@@ -18,10 +18,7 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Module;
 import edu.sjsu.cohort6.esp.common.*;
-import edu.sjsu.cohort6.esp.dao.BaseDAO;
-import edu.sjsu.cohort6.esp.dao.DBClient;
-import edu.sjsu.cohort6.esp.dao.DBFactory;
-import edu.sjsu.cohort6.esp.dao.DatabaseModule;
+import edu.sjsu.cohort6.esp.dao.*;
 import edu.sjsu.cohort6.esp.dao.mongodb.CourseDAO;
 import edu.sjsu.cohort6.esp.dao.mongodb.UserDAO;
 import org.testng.Assert;
@@ -33,6 +30,7 @@ import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 /**
@@ -130,7 +128,8 @@ public abstract class DBTest<T extends BaseDAO, S> {
     }
 
     public static User getTestUser() {
-        return new User("john.doe@sjsu.edu", "john.doe@sjsu.edu", "John", "Doe", new Role(RoleType.STUDENT));
+        String randStr = getRandomStr();
+        return new User("john.doe@sjsu.edu-" + randStr, "john.doe@sjsu.edu-" + randStr, "John-"+randStr, "Doe", new Role(RoleType.STUDENT));
     }
 
     /**
@@ -139,7 +138,7 @@ public abstract class DBTest<T extends BaseDAO, S> {
      * @return
      * @throws ParseException
      */
-    public static List<String> testCreateCourse() throws ParseException {
+    public static List<String> testCreateCourse() throws ParseException, DBException {
         Course course = getTestCourse();
         log.info("Course : " + course);
         CourseDAO courseDAO = (CourseDAO)client.getDAO(CourseDAO.class);
@@ -164,6 +163,8 @@ public abstract class DBTest<T extends BaseDAO, S> {
             add("Thomas Hildebrand");
             add("Aktouf");
         }};
+
+        String randomStr = getRandomStr();
         return new Course.Builder("Cloud Technologies")
                 .maxCapacity(20)
                 .price(200.0)
@@ -174,5 +175,10 @@ public abstract class DBTest<T extends BaseDAO, S> {
                 .location("Santa Clara, CA")
                 .keywords(keywords)
                 .build();
+    }
+
+    private static String getRandomStr() {
+        Random rand = new Random();
+        return Integer.toString(rand.nextInt());
     }
 }

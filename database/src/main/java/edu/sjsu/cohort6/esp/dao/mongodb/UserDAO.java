@@ -21,7 +21,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.BaseDAO;
-import org.bson.types.ObjectId;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.dao.BasicDAO;
@@ -64,9 +63,9 @@ public class UserDAO extends BasicDAO<User, String> implements BaseDAO<User> {
 
     @Override
     public long remove(List<String> entityIdsList) {
-        List<ObjectId> objectIds = new ArrayList<>();
+        List<String> objectIds = new ArrayList<>();
         for (String id : entityIdsList) {
-            objectIds.add(new ObjectId(id));
+            objectIds.add(id);
         }
         Query<User> query = this.createQuery().field(Mapper.ID_KEY).in(objectIds);
         return this.deleteByQuery(query).getN();
@@ -79,23 +78,24 @@ public class UserDAO extends BasicDAO<User, String> implements BaseDAO<User> {
                     .set("emailId", u.getEmailId())
                     .set("lastName", u.getLastName())
                     .set("firstName", u.getFirstName())
-                    .set("userName", u.getUserName());
+                    .set("userName", u.getUserName())
+                    .set("token", u.getToken());
 
-            Query<User> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(new ObjectId(u.getId()));
+            Query<User> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(u.getId());
             this.update(updateQuery, ops);
         }
     }
 
     @Override
     public List<User> fetchById(List<String> entityIdsList) {
-        List<ObjectId> objectIds = new ArrayList<>();
+        List<String> objectIds = new ArrayList<>();
         Query<User> query =  null;
 
         if (entityIdsList != null) {
             for (String id : entityIdsList) {
                 if (id != null) {
                     //id = CommonUtils.sanitizeIdString(id);
-                    objectIds.add(new ObjectId(id));
+                    objectIds.add(id);
                 }
             }
         }

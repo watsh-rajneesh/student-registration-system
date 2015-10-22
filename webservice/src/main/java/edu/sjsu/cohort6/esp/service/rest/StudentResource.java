@@ -22,12 +22,12 @@ import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
-import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,8 +123,9 @@ public class StudentResource extends BaseResource<Student> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Student update(/*@Auth User user,*/ @PathParam("id") String id, @Valid Student student) throws ResourceNotFoundException {
-        student.setId(new ObjectId(id).toString());
+    public Student update(/*@Auth User user,*/ @PathParam("id") String id, @Valid String studentJson) throws ResourceNotFoundException, IOException {
+        Student student = CommonUtils.convertJsonToObject(studentJson, Student.class);
+        student.setId(id);
         try {
             studentDAO.update(getListFromEntity(student));
             List<Student> studentList = studentDAO.fetchById(getListFromEntityId(id));

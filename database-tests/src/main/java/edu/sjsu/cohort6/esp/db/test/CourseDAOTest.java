@@ -15,6 +15,7 @@
 package edu.sjsu.cohort6.esp.db.test;
 
 import edu.sjsu.cohort6.esp.common.Course;
+import edu.sjsu.cohort6.esp.dao.DBException;
 import edu.sjsu.cohort6.esp.dao.mongodb.CourseDAO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -95,7 +96,7 @@ public class CourseDAOTest extends DBTest<CourseDAO, Course> {
     }
 
     @Test(dataProvider = "dp")
-    public void testFetchParametrized(String query, int expectedCount) throws ParseException {
+    public void testFetchParametrized(String query, int expectedCount) throws ParseException, DBException {
         testCreateCourse();
         List<Course> courses = dao.fetch(query);
         log.info(courses.toString());

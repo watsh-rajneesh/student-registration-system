@@ -20,12 +20,12 @@ import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
-import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public class CourseResource extends BaseResource<Course> {
     @Produces(MediaType.APPLICATION_JSON)
     public List<Course> list(/*@Auth User user*/) throws InternalErrorException {
         List<String> courseIds = new ArrayList<>();
-        List<Course> courseList = courseDAO.fetchById(courseIds);
+        List<Course> courseList = courseDAO.fetchById(null);
         return courseList;
     }
 
@@ -94,8 +94,9 @@ public class CourseResource extends BaseResource<Course> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Course update(/*@Auth User user,*/ @PathParam("id") String id, @Valid Course entity) throws ResourceNotFoundException, InternalErrorException {
-        entity.setId(new ObjectId(id).toString());
+    public Course update(/*@Auth User user,*/ @PathParam("id") String id, @Valid String courseJson) throws ResourceNotFoundException, InternalErrorException, IOException {
+        Course entity = CommonUtils.convertJsonToObject(courseJson, Course.class);
+        entity.setId(id);
         try {
             courseDAO.update(getListFromEntity(entity));
             List<Course> courseList = courseDAO.fetchById(getListFromEntityId(id));

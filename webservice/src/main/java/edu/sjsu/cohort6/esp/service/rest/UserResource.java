@@ -20,12 +20,12 @@ import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
-import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,10 +93,11 @@ public class UserResource extends BaseResource<User> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public User update(/*@Auth User user,*/ @PathParam("id") String id, @Valid User entity) throws ResourceNotFoundException, InternalErrorException {
-        entity.setId(new ObjectId(id).toString());
+    public User update(/*@Auth User user,*/ @PathParam("id") String id, @Valid String userJson) throws ResourceNotFoundException, InternalErrorException, IOException {
+        User user = CommonUtils.convertJsonToObject(userJson, User.class);
+        user.setId(id);
         try {
-            userDAO.update(getListFromEntity(entity));
+            userDAO.update(getListFromEntity(user));
             List<User> userList = userDAO.fetchById(getListFromEntityId(id));
             if (userList != null && !userList.isEmpty()) {
                 return userList.get(0);

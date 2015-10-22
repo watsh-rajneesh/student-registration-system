@@ -28,6 +28,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public abstract class BaseResource<T extends BaseModel> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     abstract public T update(/*@Auth User user,*/ @PathParam("id") String id,
-                        @Valid T entity) throws ResourceNotFoundException, InternalErrorException;
+                        @Valid String entity) throws ResourceNotFoundException, InternalErrorException, IOException;
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
