@@ -67,7 +67,20 @@ public class CreateUserCommand extends ConfiguredCommand<StudentRegistrationServ
 
             // Setting userName to be emailId for now.
             user.setUserName(user.getEmailId());
-            user.setToken(user.randomUUID().toString());
+            System.out.println("Enter password: ");
+            //user.setToken(user.randomUUID().toString());
+            String token = null;
+            String token2 = null;
+
+            while (token == null || !token.equals(token2)) {
+                token = readInput(scanner);
+                System.out.println("Re-enter password: ");
+                token2 = readInput(scanner);
+                if (token.equals(token2)) {
+                    user.setToken(token);
+                }
+            }
+
             user.setRole(new Role(RoleType.ADMIN));
 
             UserDAO userDAO = (UserDAO) dbClient.getDAO(UserDAO.class);
