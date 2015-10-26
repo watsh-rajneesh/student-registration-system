@@ -15,6 +15,7 @@
 package edu.sjsu.cohort6.esp.service.rest;
 
 import edu.sjsu.cohort6.esp.common.BaseModel;
+import edu.sjsu.cohort6.esp.common.RoleType;
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.dao.mongodb.CourseDAO;
@@ -73,6 +74,7 @@ public abstract class BaseResource<T extends BaseModel> {
     @Produces(MediaType.APPLICATION_JSON)
     abstract public List<T> list(@Auth User user, @QueryParam("filter") String filter) throws InternalErrorException;
 
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
@@ -117,5 +119,10 @@ public abstract class BaseResource<T extends BaseModel> {
         }
         return entitiesList;
     }
+
+    protected boolean isAdminUser(@Auth User user) {
+        return user.getRole().getRole().equals(RoleType.ADMIN);
+    }
+
 }
 

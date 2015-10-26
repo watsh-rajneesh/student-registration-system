@@ -18,6 +18,7 @@ import edu.sjsu.cohort6.esp.common.CommonUtils;
 import edu.sjsu.cohort6.esp.common.Course;
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
+import edu.sjsu.cohort6.esp.service.rest.exception.AuthorizationException;
 import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
@@ -40,6 +41,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Course endpoint.
+ *
+ * All methods, except listing course(s), in this endpoint are accessible only to Admin user.
+ *
  * @author rwatsh on 9/24/15.
  */
 @Path(EndpointUtils.ENDPOINT_ROOT + "/courses")
@@ -58,14 +63,18 @@ public class CourseResource extends BaseResource<Course> {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(@Auth User user, @Valid String courseJson, @Context UriInfo info) {
         try {
-            Course c = CommonUtils.convertJsonToObject(courseJson, Course.class);
-            List<Course> courseList = new ArrayList<>();
-            courseList.add(c);
-            courseDAO.add(courseList);
-            URI uri = UriBuilder.fromResource(CourseResource.class).build(c.getId());
-            return Response.created(uri)
-                    .entity(Entity.json(c))
-                    .build();
+            if (isAdminUser(user)) {
+                Course c = CommonUtils.convertJsonToObject(courseJson, Course.class);
+                List<Course> courseList = new ArrayList<>();
+                courseList.add(c);
+                courseDAO.add(courseList);
+                URI uri = UriBuilder.fromResource(CourseResource.class).build(c.getId());
+                return Response.created(uri)
+                        .entity(Entity.json(c))
+                        .build();
+            } else {
+                throw new AuthorizationException("User " + user.getUserName() + " is not allowed to perform this operation");
+            }
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error in adding course", e);
             throw new BadRequestException();
@@ -129,70 +138,87 @@ public class CourseResource extends BaseResource<Course> {
     @Path("/{id}")
     public Course update(@Auth User user, @PathParam("id") String id, @Valid String courseJson) throws ResourceNotFoundException, InternalErrorException, IOException {
         try {
-            Course course = null;
-            List<Course> courseList = courseDAO.fetchById(getListFromEntityId(id));
-            if (courseList != null && !courseList.isEmpty()) {
-                course = courseList.get(0);
-            }
-            if (course == null) {
-                throw new ResourceNotFoundException();
-            }
-            // Parse JSON payload and update the fields that are updated.
-            JSONParser parser=new JSONParser();
-            JSONObject json = (JSONObject) parser.parse(courseJson);
+            if (isAdminUser(user)) {
+                Course course = null;
+                List<Course> courseList = courseDAO.fetchById(getListFromEntityId(id));
+                if (courseList != null && !courseList.isEmpty()) {
+                    course = courseList.get(0);
+                }
+                if (course == null) {
+                    throw new ResourceNotFoundException();
+                }
+                // Parse JSON payload and update the fields that are updated.
+                JSONParser parser = new JSONParser();
+                JSONObject json = (JSONObject) parser.parse(courseJson);
 
-            String val = (String) json.get("courseName");
-            if (val != null) {
-                course.setCourseName(val);
-            }
-            JSONArray arr = (JSONArray) json.get("instructors");
-            if (arr != null) {
-                course.setInstructors(arr.subList(0,arr.size()));
-            }
-            val = (String) json.get("startTime");
-            if (val != null) {
-                course.setStartTime(CommonUtils.getDateFromString(val));
-            }
-            val = (String) json.get("endTime");
-            if (val != null) {
-                course.setEndTime(CommonUtils.getDateFromString(val));
-            }
-            val = (String) json.get("availabilityStatus");
-            if (val != null) {
-                course.setAvailabilityStatus(Integer.parseInt(val));
-            }
-            val = (String) json.get("maxCapacity");
-            if (val != null) {
-                course.setMaxCapacity(Integer.parseInt(val));
-            }
-            val = (String) json.get("price");
-            if (val != null) {
-                course.setPrice(Double.parseDouble(val));
-            }
-            val = (String) json.get("location");
-            if (val != null) {
-                course.setLocation(val);
-            }
-            arr = (JSONArray) json.get("keywords");
-            if (arr != null) {
-                course.setKeywords(arr.subList(0, arr.size()));
-            }
+                String val = (String) json.get("courseName");
+                if (val != null) {
+                    course.setCourseName(val);
+                }
+                JSONArray arr = (JSONArray) json.get("instructors");
+                if (arr != null) {
+                    course.setInstructors(arr.subList(0, arr.size()));
+                }
+                val = (String) json.get("startTime");
+                if (val != null) {
+                    course.setStartTime(CommonUtils.getDateFromString(val));
+                }
+                val = (String) json.get("endTime");
+                if (val != null) {
+                    course.setEndTime(CommonUtils.getDateFromString(val));
+                }
+                val = (String) json.get("availabilityStatus");
+                if (val != null) {
+                    course.setAvailabilityStatus(Integer.parseInt(val));
+                }
+                val = (String) json.get("maxCapacity");
+                if (val != null) {
+                    course.setMaxCapacity(Integer.parseInt(val));
+                }
+                val = (String) json.get("price");
+                if (val != null) {
+                    course.setPrice(Double.parseDouble(val));
+                }
+                val = (String) json.get("location");
+                if (val != null) {
+                    course.setLocation(val);
+                }
+                arr = (JSONArray) json.get("keywords");
+                if (arr != null) {
+                    course.setKeywords(arr.subList(0, arr.size()));
+                }
 
-            courseDAO.update(getListFromEntity(course));
-            return course;
+                courseDAO.update(getListFromEntity(course));
+                return course;
+            } else {
+                throw new AuthorizationException("User " + user.getUserName() + " is not allowed to perform this operation");
+            }
         } catch (Exception e) {
             throw new InternalErrorException(e);
         }
     }
 
+    /**
+     * Delete course.
+     *
+     * @param user
+     * @param id
+     * @return
+     * @throws ResourceNotFoundException
+     * @throws InternalErrorException
+     */
     @Override
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         try {
-            courseDAO.remove(getListFromEntityId(id));
-            return Response.ok().build();
+            if (isAdminUser(user)) {
+                courseDAO.remove(getListFromEntityId(id));
+                return Response.ok().build();
+            } else {
+                throw new AuthorizationException("User " + user.getUserName() + " is not allowed to perform this operation");
+            }
         } catch (Exception e) {
             throw new ResourceNotFoundException();
         }

@@ -30,6 +30,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 import java.io.IOException;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -52,6 +53,16 @@ public class StudentResource extends BaseResource<Student> {
     }
 
 
+    /**
+     * Creates a new student.
+     * Anyone can signup as a new student so the authentication is not required.
+     * Student JSON needs to be complete except the generated fields like id and lastUpdated.
+     *
+     * @param user
+     * @param studentJson
+     * @param info
+     * @return
+     */
     @Override
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -74,7 +85,7 @@ public class StudentResource extends BaseResource<Student> {
         }
     }
 
-    public void findCoursesForStudent(Student s) {
+    private void findCoursesForStudent(Student s) {
         List<Course> courses = s.getCourseRefs();
         List<Course> coursesFoundList = new ArrayList<>();
         if (courses != null && !courses.isEmpty()) {
@@ -89,12 +100,13 @@ public class StudentResource extends BaseResource<Student> {
         s.setCourseRefs(coursesFoundList);
     }
 
-    public void createUserForStudent(Student s) {
+    private void createUserForStudent(Student s) {
         User u = s.getUser();
         List<User> userList = new ArrayList<>();
         userList.add(u);
         userDAO.add(userList);
     }
+
 
     @Override
     @GET
@@ -103,7 +115,7 @@ public class StudentResource extends BaseResource<Student> {
         /**
          * This method can only be run by an ADMIN.
          */
-        if (user.getRole().getRole().equals(RoleType.ADMIN)) {
+        if (isAdminUser(user)) {
             List<String> studentIds = new ArrayList<>();
             List<Student> studentList = studentDAO.fetchById(studentIds);
             return studentList;
@@ -132,8 +144,6 @@ public class StudentResource extends BaseResource<Student> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public Student update(@Auth User user, @PathParam("id") String id, @Valid String studentJson) throws ResourceNotFoundException, IOException {
-        /*Student student = CommonUtils.convertJsonToObject(studentJson, Student.class);
-        student.setId(id);*/
         try {
             Student student = null;
             List<Student> studentList = studentDAO.fetchById(getListFromEntityId(id));
@@ -144,73 +154,84 @@ public class StudentResource extends BaseResource<Student> {
                 throw new ResourceNotFoundException();
             }
 
-            JSONParser parser=new JSONParser();
-            JSONObject json = (JSONObject) parser.parse(studentJson);
-            JSONObject userObj = (JSONObject) json.get("user");
+            /**
+             * A student can only update his/her own data.
+             * Admin user can update any student's data.
+             */
+            if (isAdminUser(user) || student.getUser().getUserName().equals(user.getUserName())) {
 
-            if (userObj != null) {
-                String val = (String) userObj.get("emailId");
-                if (val != null) {
-                    student.getUser().setEmailId(val);
-                }
-                val = (String) userObj.get("userName");
-                if (val != null) {
-                    student.getUser().setUserName(val);
-                }
-                val = (String) userObj.get("token");
-                if (val != null) {
-                    student.getUser().setToken(val);
-                }
-                val = (String) userObj.get("firstName");
-                if (val != null) {
-                    student.getUser().setFirstName(val);
-                }
-                val = (String) userObj.get("lastName");
-                if (val != null) {
-                    student.getUser().setLastName(val);
-                }
-                JSONObject roleObj = (JSONObject) userObj.get("role");
-                if (roleObj != null) {
-                    val = (String) roleObj.get("role");
-                    if (val != null) {
-                        student.getUser().getRole().setRole(val.equalsIgnoreCase("student") ?
-                        RoleType.STUDENT : RoleType.ADMIN);
-                    }
-                }
-            }
-            JSONObject courseObj = (JSONObject) json.get("courseRef");
-            if (courseObj != null) {
-                String val = (String) courseObj.get("enrollId");
-                if (val != null) {
-                    List<Course> courses = courseDAO.fetchById(getListFromEntityId(val));
-                    enrollToCourse(student, courses);
-                } else {
-                    val = (String) courseObj.get("enrollCourseName");
-                    if (val != null) {
-                        List<Course> courses = courseDAO.fetch("{courseName: \"" + val + "\"}");
-                        enrollToCourse(student, courses);
-                    }
-                }
+                JSONParser parser = new JSONParser();
+                JSONObject json = (JSONObject) parser.parse(studentJson);
+                JSONObject userObj = (JSONObject) json.get("user");
 
-                val = (String) courseObj.get("unEnrollId");
-                if (val != null) {
-                    List<Course> courses = courseDAO.fetchById(getListFromEntityId(val));
-                    if (!courses.isEmpty()) {
-                        student.getCourseRefs().remove(courses.get(0));
-                    }
-                } else {
-                    val = (String) courseObj.get("unEnrollCourseName");
+                if (userObj != null) {
+                    String val = (String) userObj.get("emailId");
                     if (val != null) {
-                        List<Course> courses = courseDAO.fetch("{courseName: \"" + val + "\"}");
-                        if (!courses.isEmpty()) {
-                            student.getCourseRefs().remove(courses.get(0));
+                        student.getUser().setEmailId(val);
+                    }
+                    val = (String) userObj.get("userName");
+                    if (val != null) {
+                        student.getUser().setUserName(val);
+                    }
+                    val = (String) userObj.get("token");
+                    if (val != null) {
+                        student.getUser().setToken(val);
+                    }
+                    val = (String) userObj.get("firstName");
+                    if (val != null) {
+                        student.getUser().setFirstName(val);
+                    }
+                    val = (String) userObj.get("lastName");
+                    if (val != null) {
+                        student.getUser().setLastName(val);
+                    }
+                    JSONObject roleObj = (JSONObject) userObj.get("role");
+                    if (roleObj != null) {
+                        val = (String) roleObj.get("role");
+                        if (val != null) {
+                            student.getUser().getRole().setRole(val.equalsIgnoreCase("student") ?
+                                    RoleType.STUDENT : RoleType.ADMIN);
                         }
                     }
                 }
-            }
+                JSONObject courseObj = (JSONObject) json.get("courseRef");
+                if (courseObj != null) {
+                    String val = (String) courseObj.get("enrollId");
+                    if (val != null) {
+                        List<Course> courses = courseDAO.fetchById(getListFromEntityId(val));
+                        enrollToCourse(student, courses);
+                    } else {
+                        val = (String) courseObj.get("enrollCourseName");
+                        if (val != null) {
+                            List<Course> courses = courseDAO.fetch("{courseName: \"" + val + "\"}");
+                            enrollToCourse(student, courses);
+                        }
+                    }
 
-            studentDAO.update(getListFromEntity(student));
-            return student;
+                    val = (String) courseObj.get("unEnrollId");
+                    if (val != null) {
+                        List<Course> courses = courseDAO.fetchById(getListFromEntityId(val));
+                        if (!courses.isEmpty()) {
+                            student.getCourseRefs().remove(courses.get(0));
+                        }
+                    } else {
+                        val = (String) courseObj.get("unEnrollCourseName");
+                        if (val != null) {
+                            List<Course> courses = courseDAO.fetch("{courseName: \"" + val + "\"}");
+                            if (!courses.isEmpty()) {
+                                student.getCourseRefs().remove(courses.get(0));
+                            }
+                        }
+                    }
+                }
+
+                studentDAO.update(getListFromEntity(student));
+                return student;
+            } else {
+                throw new AuthorizationException(
+                        MessageFormat.format("User {0} cannot update user {1} data.",
+                                user.getUserName(), student.getUser().getUserName()));
+            }
         } catch (Exception e) {
             throw new InternalErrorException(e);
         }
@@ -232,14 +253,26 @@ public class StudentResource extends BaseResource<Student> {
         }
     }
 
+    /**
+     * Delete student.
+     *
+     * @param user
+     * @param id
+     * @return
+     * @throws ResourceNotFoundException
+     */
     @Override
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException {
         try {
-            studentDAO.remove(getListFromEntityId(id));
-            return Response.ok().build();
+            if(isAdminUser(user)) {
+                studentDAO.remove(getListFromEntityId(id));
+                return Response.ok().build();
+            } else {
+                throw new AuthorizationException("User " + user.getUserName() + " is not allowed to perform this operation");
+            }
         } catch (Exception e) {
             throw new ResourceNotFoundException();
         }
