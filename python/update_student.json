@@ -1,0 +1,17 @@
+{
+    "user": {
+        "emailId": "java.guy@sjsu.edu",
+        "userName": "java.guy@sjsu.edu",
+        "token": "password2",
+        "firstName": "Watsh",
+        "lastName": "Rajneesh",
+        "role": {
+            "role": "STUDENT"
+        }
+    },
+  "courseRef" : {
+    "enrollCourseName": "Cloud Technologies",
+    "unEnrollId": "56283cdbf7eeee0c36512b17"
+  }
+}
+

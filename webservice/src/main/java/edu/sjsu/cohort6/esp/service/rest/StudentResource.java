@@ -14,14 +14,15 @@
 
 package edu.sjsu.cohort6.esp.service.rest;
 
-import edu.sjsu.cohort6.esp.common.CommonUtils;
-import edu.sjsu.cohort6.esp.common.Course;
-import edu.sjsu.cohort6.esp.common.Student;
-import edu.sjsu.cohort6.esp.common.User;
+import edu.sjsu.cohort6.esp.common.*;
 import edu.sjsu.cohort6.esp.dao.DBClient;
+import edu.sjsu.cohort6.esp.service.rest.exception.AuthorizationException;
 import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
+import io.dropwizard.auth.Auth;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -55,7 +56,7 @@ public class StudentResource extends BaseResource<Student> {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(/*@Auth User user,*/ @Valid String studentJson, @Context UriInfo info) {
+    public Response create(@Auth(required=false) User user, @Valid String studentJson, @Context UriInfo info) {
         try {
             Student s = CommonUtils.convertJsonToObject(studentJson, Student.class);
             List<Student> studentList = new ArrayList<>();
@@ -98,17 +99,24 @@ public class StudentResource extends BaseResource<Student> {
     @Override
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List list(/*@Auth User user*/) {
-        List<String> studentIds = new ArrayList<>();
-        List<Student> studentList = studentDAO.fetchById(studentIds);
-        return studentList;
+    public List list(@Auth User user, @QueryParam("filter") String filter) {
+        /**
+         * This method can only be run by an ADMIN.
+         */
+        if (user.getRole().getRole().equals(RoleType.ADMIN)) {
+            List<String> studentIds = new ArrayList<>();
+            List<Student> studentList = studentDAO.fetchById(studentIds);
+            return studentList;
+        } else {
+            throw new AuthorizationException("User " + user.getUserName() + " is not allowed to perform this operation");
+        }
     }
 
     @Override
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Student retrieve(/*@Auth User user, */@PathParam("id") String studentId) throws ResourceNotFoundException {
+    public Student retrieve(@Auth User user, @PathParam("id") String studentId) throws ResourceNotFoundException {
         List<String> studentIds = getListFromEntityId(studentId);
         List<Student> studentList = studentDAO.fetchById(studentIds);
         if (studentList != null && !studentList.isEmpty()) {
@@ -123,18 +131,104 @@ public class StudentResource extends BaseResource<Student> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Student update(/*@Auth User user,*/ @PathParam("id") String id, @Valid String studentJson) throws ResourceNotFoundException, IOException {
-        Student student = CommonUtils.convertJsonToObject(studentJson, Student.class);
-        student.setId(id);
+    public Student update(@Auth User user, @PathParam("id") String id, @Valid String studentJson) throws ResourceNotFoundException, IOException {
+        /*Student student = CommonUtils.convertJsonToObject(studentJson, Student.class);
+        student.setId(id);*/
         try {
-            studentDAO.update(getListFromEntity(student));
+            Student student = null;
             List<Student> studentList = studentDAO.fetchById(getListFromEntityId(id));
             if (studentList != null && !studentList.isEmpty()) {
-                return studentList.get(0);
+                student = studentList.get(0);
             }
-            throw new ResourceNotFoundException();
+            if (student == null) {
+                throw new ResourceNotFoundException();
+            }
+
+            JSONParser parser=new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(studentJson);
+            JSONObject userObj = (JSONObject) json.get("user");
+
+            if (userObj != null) {
+                String val = (String) userObj.get("emailId");
+                if (val != null) {
+                    student.getUser().setEmailId(val);
+                }
+                val = (String) userObj.get("userName");
+                if (val != null) {
+                    student.getUser().setUserName(val);
+                }
+                val = (String) userObj.get("token");
+                if (val != null) {
+                    student.getUser().setToken(val);
+                }
+                val = (String) userObj.get("firstName");
+                if (val != null) {
+                    student.getUser().setFirstName(val);
+                }
+                val = (String) userObj.get("lastName");
+                if (val != null) {
+                    student.getUser().setLastName(val);
+                }
+                JSONObject roleObj = (JSONObject) userObj.get("role");
+                if (roleObj != null) {
+                    val = (String) roleObj.get("role");
+                    if (val != null) {
+                        student.getUser().getRole().setRole(val.equalsIgnoreCase("student") ?
+                        RoleType.STUDENT : RoleType.ADMIN);
+                    }
+                }
+            }
+            JSONObject courseObj = (JSONObject) json.get("courseRef");
+            if (courseObj != null) {
+                String val = (String) courseObj.get("enrollId");
+                if (val != null) {
+                    List<Course> courses = courseDAO.fetchById(getListFromEntityId(val));
+                    enrollToCourse(student, courses);
+                } else {
+                    val = (String) courseObj.get("enrollCourseName");
+                    if (val != null) {
+                        List<Course> courses = courseDAO.fetch("{courseName: \"" + val + "\"}");
+                        enrollToCourse(student, courses);
+                    }
+                }
+
+                val = (String) courseObj.get("unEnrollId");
+                if (val != null) {
+                    List<Course> courses = courseDAO.fetchById(getListFromEntityId(val));
+                    if (!courses.isEmpty()) {
+                        student.getCourseRefs().remove(courses.get(0));
+                    }
+                } else {
+                    val = (String) courseObj.get("unEnrollCourseName");
+                    if (val != null) {
+                        List<Course> courses = courseDAO.fetch("{courseName: \"" + val + "\"}");
+                        if (!courses.isEmpty()) {
+                            student.getCourseRefs().remove(courses.get(0));
+                        }
+                    }
+                }
+            }
+
+            studentDAO.update(getListFromEntity(student));
+            return student;
         } catch (Exception e) {
             throw new InternalErrorException(e);
+        }
+    }
+
+    /**
+     * Adds the course to student only if it is not already present.
+     *
+     * @param student
+     * @param courses
+     */
+    private void enrollToCourse(Student student, List<Course> courses) {
+        if (!courses.isEmpty()) {
+            Course course = courses.get(0);
+            if (!student.getCourseRefs().contains(course)) {
+                student.getCourseRefs().add(course);
+            }
+
         }
     }
 
@@ -142,7 +236,7 @@ public class StudentResource extends BaseResource<Student> {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Response delete(/*@Auth User user,*/ @PathParam("id") String id) throws ResourceNotFoundException {
+    public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException {
         try {
             studentDAO.remove(getListFromEntityId(id));
             return Response.ok().build();

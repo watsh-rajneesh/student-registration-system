@@ -20,6 +20,7 @@ import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
+import io.dropwizard.auth.Auth;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -49,7 +50,7 @@ public class UserResource extends BaseResource<User> {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(/*@Auth User user,*/ @Valid String userJson, @Context UriInfo info) {
+    public Response create(@Auth User user1, @Valid String userJson, @Context UriInfo info) {
         try {
             User user = CommonUtils.convertJsonToObject(userJson, User.class);
             List<User> userList = new ArrayList<>();
@@ -68,7 +69,7 @@ public class UserResource extends BaseResource<User> {
     @Override
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List list(/*@Auth User user*/) throws InternalErrorException {
+    public List list(@Auth User user, @QueryParam("filter") String filter) throws InternalErrorException {
         List<String> userIds = new ArrayList<>();
         List<User> userList = userDAO.fetchById(userIds);
         return userList;
@@ -78,7 +79,7 @@ public class UserResource extends BaseResource<User> {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public User retrieve(/*@Auth User user,*/ @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
+    public User retrieve(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         List<String> userIdList = getListFromEntityId(id);
         List<User> userList = userDAO.fetchById(userIdList);
         if (userList != null && !userList.isEmpty()) {
@@ -93,7 +94,7 @@ public class UserResource extends BaseResource<User> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public User update(/*@Auth User user,*/ @PathParam("id") String id, @Valid String userJson) throws ResourceNotFoundException, InternalErrorException, IOException {
+    public User update(@Auth User user1, @PathParam("id") String id, @Valid String userJson) throws ResourceNotFoundException, InternalErrorException, IOException {
         User user = CommonUtils.convertJsonToObject(userJson, User.class);
         user.setId(id);
         try {
@@ -112,7 +113,7 @@ public class UserResource extends BaseResource<User> {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Response delete(/*@Auth User user, */@PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
+    public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         try {
             userDAO.remove(getListFromEntityId(id));
             return Response.ok().build();

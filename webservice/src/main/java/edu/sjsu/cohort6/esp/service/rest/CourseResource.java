@@ -16,17 +16,21 @@ package edu.sjsu.cohort6.esp.service.rest;
 
 import edu.sjsu.cohort6.esp.common.CommonUtils;
 import edu.sjsu.cohort6.esp.common.Course;
+import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
+import io.dropwizard.auth.Auth;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -49,7 +53,7 @@ public class CourseResource extends BaseResource<Course> {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(/*@Auth User user,*/ @Valid String courseJson, @Context UriInfo info) {
+    public Response create(@Auth User user, @Valid String courseJson, @Context UriInfo info) {
         try {
             Course c = CommonUtils.convertJsonToObject(courseJson, Course.class);
             List<Course> courseList = new ArrayList<>();
@@ -69,17 +73,43 @@ public class CourseResource extends BaseResource<Course> {
     @Override
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Course> list(/*@Auth User user*/) throws InternalErrorException {
-        List<String> courseIds = new ArrayList<>();
-        List<Course> courseList = courseDAO.fetchById(null);
+    public List<Course> list(@Auth User user, @QueryParam("filter") String filter) throws InternalErrorException {
+        List<Course> courseList = null;
+        if (filter != null && !filter.trim().isEmpty()) {
+            String query = null;
+            try {
+                query = buildQueryJson(filter);
+            } catch (UnsupportedEncodingException e) {
+                throw new InternalErrorException(e);
+            }
+            courseList = courseDAO.fetch(query);
+        } else {
+            courseList = courseDAO.fetchById(null);
+        }
         return courseList;
+    }
+
+    /**
+     * Returns a decoded query string.
+     *
+     * TODO: We may also build a query as described in:
+     * https://americommerce.zendesk.com/hc/en-us/articles/202836800-Resource-Query-Filtering-Syntax
+     *
+     * Once we do that we can build the query string in JSON to be passed to mongodb.
+     *
+     * @param query
+     * @return
+     */
+    private String buildQueryJson(String query) throws UnsupportedEncodingException {
+
+        return URLDecoder.decode(query, "UTF-8");
     }
 
     @Override
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Course retrieve(/*@Auth User user,*/ @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
+    public Course retrieve(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         List<String> courseIdList = getListFromEntityId(id);
         List<Course> courseList = courseDAO.fetchById(courseIdList);
         if (courseList != null && !courseList.isEmpty()) {
@@ -94,7 +124,7 @@ public class CourseResource extends BaseResource<Course> {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Course update(/*@Auth User user,*/ @PathParam("id") String id, @Valid String courseJson) throws ResourceNotFoundException, InternalErrorException, IOException {
+    public Course update(@Auth User user, @PathParam("id") String id, @Valid String courseJson) throws ResourceNotFoundException, InternalErrorException, IOException {
         Course entity = CommonUtils.convertJsonToObject(courseJson, Course.class);
         entity.setId(id);
         try {
@@ -113,7 +143,7 @@ public class CourseResource extends BaseResource<Course> {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Response delete(/*@Auth User user,*/ @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
+    public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         try {
             courseDAO.remove(getListFromEntityId(id));
             return Response.ok().build();
