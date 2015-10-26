@@ -22,6 +22,9 @@ import edu.sjsu.cohort6.esp.service.rest.exception.BadRequestException;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
 import edu.sjsu.cohort6.esp.service.rest.exception.ResourceNotFoundException;
 import io.dropwizard.auth.Auth;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -125,15 +128,58 @@ public class CourseResource extends BaseResource<Course> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public Course update(@Auth User user, @PathParam("id") String id, @Valid String courseJson) throws ResourceNotFoundException, InternalErrorException, IOException {
-        Course entity = CommonUtils.convertJsonToObject(courseJson, Course.class);
-        entity.setId(id);
         try {
-            courseDAO.update(getListFromEntity(entity));
+            Course course = null;
             List<Course> courseList = courseDAO.fetchById(getListFromEntityId(id));
             if (courseList != null && !courseList.isEmpty()) {
-                return courseList.get(0);
+                course = courseList.get(0);
             }
-            throw new ResourceNotFoundException();
+            if (course == null) {
+                throw new ResourceNotFoundException();
+            }
+            // Parse JSON payload and update the fields that are updated.
+            JSONParser parser=new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(courseJson);
+
+            String val = (String) json.get("courseName");
+            if (val != null) {
+                course.setCourseName(val);
+            }
+            JSONArray arr = (JSONArray) json.get("instructors");
+            if (arr != null) {
+                course.setInstructors(arr.subList(0,arr.size()));
+            }
+            val = (String) json.get("startTime");
+            if (val != null) {
+                course.setStartTime(CommonUtils.getDateFromString(val));
+            }
+            val = (String) json.get("endTime");
+            if (val != null) {
+                course.setEndTime(CommonUtils.getDateFromString(val));
+            }
+            val = (String) json.get("availabilityStatus");
+            if (val != null) {
+                course.setAvailabilityStatus(Integer.parseInt(val));
+            }
+            val = (String) json.get("maxCapacity");
+            if (val != null) {
+                course.setMaxCapacity(Integer.parseInt(val));
+            }
+            val = (String) json.get("price");
+            if (val != null) {
+                course.setPrice(Double.parseDouble(val));
+            }
+            val = (String) json.get("location");
+            if (val != null) {
+                course.setLocation(val);
+            }
+            arr = (JSONArray) json.get("keywords");
+            if (arr != null) {
+                course.setKeywords(arr.subList(0, arr.size()));
+            }
+
+            courseDAO.update(getListFromEntity(course));
+            return course;
         } catch (Exception e) {
             throw new InternalErrorException(e);
         }
