@@ -95,6 +95,6 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
          * Not registering user resource on purpose as student resource should be used to add a student user.
          * Admin user can only be added through the command line not exposed to users.
          */
-        //environment.jersey().register(userResource);
+        environment.jersey().register(userResource);
     }
 }
