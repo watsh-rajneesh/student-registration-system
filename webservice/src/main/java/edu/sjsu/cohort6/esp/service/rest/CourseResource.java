@@ -16,6 +16,7 @@ package edu.sjsu.cohort6.esp.service.rest;
 
 import edu.sjsu.cohort6.esp.common.CommonUtils;
 import edu.sjsu.cohort6.esp.common.Course;
+import edu.sjsu.cohort6.esp.common.Student;
 import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.service.rest.exception.AuthorizationException;
@@ -214,8 +215,8 @@ public class CourseResource extends BaseResource<Course> {
     public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         try {
             if (isAdminUser(user)) {
-                // find students using this course and un-enroll
-
+                // find students using this course and un-enroll them from the course
+                updateStudentsForCourse(id);
                 courseDAO.remove(getListFromEntityId(id));
                 return Response.ok().build();
             } else {
@@ -224,5 +225,16 @@ public class CourseResource extends BaseResource<Course> {
         } catch (Exception e) {
             throw new ResourceNotFoundException();
         }
+    }
+
+    private void updateStudentsForCourse(String id) {
+        List<Student> students = studentDAO.fetch("{\"courseRefs.$id\" : \"" + id + "\"}");
+        for (Student s: students) {
+            List<Course> courses = courseDAO.fetchById(getListFromEntityId(id));
+            if (!courses.isEmpty()) {
+                s.getCourseRefs().remove(courses.get(0));
+            }
+        }
+        studentDAO.update(students);
     }
 }
