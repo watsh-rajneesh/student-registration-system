@@ -165,14 +165,19 @@ public class StudentResource extends BaseResource<Student> {
                 JSONObject userObj = (JSONObject) json.get("user");
 
                 if (userObj != null) {
-                    String val = (String) userObj.get("emailId");
+                    String val = (String) userObj.get("userName");
+                    if (val != null) {
+                        List<User> users = userDAO.fetch("{ userName: \"" + val + "\"}");
+                        if (!users.isEmpty()) {
+                            student.setUser(users.get(0));
+                        }
+                    }
+
+                    val = (String) userObj.get("emailId");
                     if (val != null) {
                         student.getUser().setEmailId(val);
                     }
-                    val = (String) userObj.get("userName");
-                    if (val != null) {
-                        student.getUser().setUserName(val);
-                    }
+
                     val = (String) userObj.get("token");
                     if (val != null) {
                         student.getUser().setToken(val);
@@ -224,7 +229,9 @@ public class StudentResource extends BaseResource<Student> {
                         }
                     }
                 }
-
+                List<User> usersList = new ArrayList<>();
+                usersList.add(student.getUser());
+                userDAO.update(usersList);
                 studentDAO.update(getListFromEntity(student));
                 return student;
             } else {

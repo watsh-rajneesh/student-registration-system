@@ -167,15 +167,15 @@ public class CourseResource extends BaseResource<Course> {
                 if (val != null) {
                     course.setEndTime(CommonUtils.getDateFromString(val));
                 }
-                val = (String) json.get("availabilityStatus");
+                val = json.get("availabilityStatus").toString();
                 if (val != null) {
                     course.setAvailabilityStatus(Integer.parseInt(val));
                 }
-                val = (String) json.get("maxCapacity");
+                val = (String) json.get("maxCapacity").toString();
                 if (val != null) {
                     course.setMaxCapacity(Integer.parseInt(val));
                 }
-                val = (String) json.get("price");
+                val = (String) json.get("price").toString();
                 if (val != null) {
                     course.setPrice(Double.parseDouble(val));
                 }
@@ -214,6 +214,8 @@ public class CourseResource extends BaseResource<Course> {
     public Response delete(@Auth User user, @PathParam("id") String id) throws ResourceNotFoundException, InternalErrorException {
         try {
             if (isAdminUser(user)) {
+                // find students using this course and un-enroll
+
                 courseDAO.remove(getListFromEntityId(id));
                 return Response.ok().build();
             } else {
