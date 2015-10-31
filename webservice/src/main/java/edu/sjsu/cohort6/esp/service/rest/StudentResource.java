@@ -54,6 +54,24 @@ public class StudentResource extends BaseResource<Student> {
 
 
     /**
+     * Used to validate the user's basic auth creds. If the user is valid then framework will let this method
+     * be invoked where we simply return 200.
+     *
+     * Every subsequent user request will also need to have the same auth creds as server wont maintain any session.
+     *
+     * @param user
+     * @param info
+     * @return
+     */
+    @HEAD
+    public Response login(@Auth User user, @Context UriInfo info) {
+        Cookie sessionCookie = new Cookie("userName", user.getUserName());
+
+        NewCookie cookies = new NewCookie(sessionCookie);
+        return Response.ok().cookie(cookies).build();
+    }
+
+    /**
      * Creates a new student.
      * Anyone can signup as a new student so the authentication is not required.
      * Student JSON needs to be complete except the generated fields like id and lastUpdated.
