@@ -133,13 +133,13 @@ public class StudentResource extends BaseResource<Student> {
         /**
          * This method can only be run by an ADMIN.
          */
-        if (isAdminUser(user)) {
+        /*if (isAdminUser(user)) {*/
             List<String> studentIds = new ArrayList<>();
             List<Student> studentList = studentDAO.fetchById(studentIds);
             return studentList;
-        } else {
+        /*} else {
             throw new AuthorizationException("User " + user.getUserName() + " is not allowed to perform this operation");
-        }
+        }*/
     }
 
     @Override
