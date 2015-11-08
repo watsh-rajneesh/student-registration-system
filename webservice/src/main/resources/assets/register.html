@@ -90,36 +90,47 @@
 <script>
 function submitform(fName, lName, eMail, id) {
 	console.log("submitform() start");
+	
+	var firstName = document.getElementsByName("register-form")[0].value;
+	var lastName = document.getElementsByName("register-form")[1].value;
+	var userName = firstName+lastName;
+	var email = document.getElementsByName("register-form")[2].value;
+	var token = document.getElementsByName("register-form")[3].value;
 
-	var studentInfo = '{ "user" : [' +
-	'{ "firstName":"'+ document.getElementsByName("register-form")[0].value +
-		'","lastName":"'+ document.getElementsByName("register-form")[1].value +'","emailId":"'+
-		document.getElementsByName("register-form")[2].value+'","token":"'+
-		document.getElementsByName("register-form")[3].value+'"' 
-		+',"role": {"role": "STUDENT"}}]}';
-		
-		
-	        
+	var studentInfo = '{ "user" : ' +
+	'{ "firstName":"' + firstName + '","lastName":"' + lastName + '","emailId":"' + email + '","token":"' + token + '"' 
+		+',"userName":"' + userName +'","role": {"role": "STUDENT"}}}';
 
-		
 	console.log(studentInfo);
 	var studentObject = JSON.parse(studentInfo);
+	
+	
 	console.log(studentObject);
 	
     jQuery.ajax({
         type: "POST",
         url: "http://localhost:8080/api/v1.0/students",
         data: studentObject,
-        contentType: "application/json; charset=utf-8",
+        contentType: "application/json",
         dataType: "json",
-        success: function (data, status, jqXHR) {
+        success: function (studentObject, status, jqXHR) {
         	console.log("POST success");
         },
     
-        error: function (jqXHR, status) {            
+        error: function (jqXHR, status,thrownError) {            
         	console.log("POST failed");
+            console.log(status);
+            console.log(studentObject);
+            
+            var requestResponse = {
+            	      httpStatus: jqXHR.status,
+            	      error: thrownError || jqXHR.statusText,
+            	    };
+
+            	    console.log(requestResponse);
         }
     });
+    
 
 	console.log("submitform() exit");
 };
