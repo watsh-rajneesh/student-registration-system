@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bootstrap - Prebuilt Layout</title>
+
+<!-- Bootstrap -->
+<link href="css/bootstrap.css" rel="stylesheet">
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<nav class="navbar navbar-default navbar-inverse">
+  <div class="container-fluid"> 
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+ </div>
+    
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="index.html">Home</a> </li>
+        <li class="active"><a href="#">Register<span class="sr-only">(current)</span></a> </li>
+        <li><a href="enroll.html">Enroll</a> </li>
+      </ul>
+    </div>
+    <!-- /.navbar-collapse --> 
+  </div>
+  <!-- /.container-fluid --> 
+</nav>
+<div class="jumbotron"> 
+<form action="register-success.html" method="get" id="frm-register" onsubmit="submitform()">
+<table width="200" border="0" align="center">
+  <tbody>
+    <tr>
+      <td nowrap><label>First Name:</label></td>
+      <td><input type="text" name="register-form" autofocus required></td>
+    </tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+      <td nowrap><label>Last Name:</label></td>
+      <td><input type="text" name="register-form" required></td>
+    </tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+      <td nowrap><label>Email Id:</label></td>
+      <td><input type="email" name="register-form" required></td>
+    </tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+      <td nowrap><label>Password:</label></td>
+      <td><input type="password" name="register-form" required></td>
+    </tr>
+    <td>&nbsp;</td>
+    <tr align="center">
+      <td><input type="reset" form="frm-register"></td>
+      <td><input type="submit" form="frm-register"></td>
+    </tr>
+  </tbody>
+ </table>
+</form>
+</div>
+<br><br><br><br><br><br><br><br>
+ <hr>
+<div class="container">
+  <div class="row">
+    <div class="text-center col-md-6 col-md-offset-3">
+<p>Copyright &copy; 2015 &middot; All Rights Reserved &middot; <a href="http://google.com/" >course4all.com</a></p>
+    </div>
+  </div>
+  
+</div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+<script src="js/jquery-1.11.2.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed --> 
+<script src="js/bootstrap.js"></script>
+
+
+
+
+<script>
+function submitform(fName, lName, eMail, id) {
+	console.log("submitform() start");
+
+	var studentInfo = '{ "user" : [' +
+	'{ "firstName":"'+ document.getElementsByName("register-form")[0].value +
+		'","lastName":"'+ document.getElementsByName("register-form")[1].value +'","emailId":"'+
+		document.getElementsByName("register-form")[2].value+'","token":"'+
+		document.getElementsByName("register-form")[3].value+'"' 
+		+',"role": {"role": "STUDENT"}}]}';
+		
+		
+	        
+
+		
+	console.log(studentInfo);
+	var studentObject = JSON.parse(studentInfo);
+	console.log(studentObject);
+	
+    jQuery.ajax({
+        type: "POST",
+        url: "http://localhost:8080/api/v1.0/students",
+        data: studentObject,
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (data, status, jqXHR) {
+        	console.log("POST success");
+        },
+    
+        error: function (jqXHR, status) {            
+        	console.log("POST failed");
+        }
+    });
+
+	console.log("submitform() exit");
+};
+</script>	
+
+
+
+</body>
+</html>
