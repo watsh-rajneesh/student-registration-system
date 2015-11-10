@@ -40,16 +40,13 @@
 </nav>
 
 <div class="jumbotron" ng-app="enrollApp" ng-controller="enrollController">
-  <h3 class="text-center">Congratulations! Registration Successfull.</h3>
+  <h3 class="text-center">Congratulations! Registration Successful.</h3>
   <div class="row">
-    <div class="col-lg-2 col-lg-offset-4 col-md-offset-4 col-md-2 col-sm-offset-3 col-sm-3 col-xs-offset-3 col-xs-3">
-    </div>
-    <div class="col-lg-2 col-md-6 col-sm-6">
-      <p ng-bind="enStatus"></p>
-      <p><button class="btn btn-primary btn-lg" role="button" ng-click="enroll()" align="center">Enroll Now</button> </p>
-    </div>
+      <p><button class="btn btn-primary center-block btn-lg" role="button" ng-click="enroll()" align="center">Enroll Now</button> </p>
   </div>
+  <p align="center" ng-bind="enStatus" class="bg-danger"></p>
 </div>
+
     
 <br><br><br><br><br><br><br><br><br><br><br><br>
 <hr>
@@ -64,7 +61,9 @@
 </footer>
 
 <script>
-var app = angular.module('enrollApp', []);
+var app = angular.module('enrollApp', []).config(['$httpProvider', function($httpProvider) {
+  $httpProvider.defaults.withCredentials = true;
+}]);
 app.controller('enrollController', function($scope, $http) {
 console.log("in here now");
     $scope.enroll = function() {      
