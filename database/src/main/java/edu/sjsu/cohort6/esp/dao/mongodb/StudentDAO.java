@@ -68,9 +68,9 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
 
     @Override
     public long remove(List<String> entityIdsList) {
-        List<ObjectId> objectIds = new ArrayList<>();
+        List<String> objectIds = new ArrayList<>();
         for (String id : entityIdsList) {
-            objectIds.add(new ObjectId(id));
+            objectIds.add(id);
         }
         Query<Student> query = this.createQuery().field(Mapper.ID_KEY).in(objectIds);
         return this.deleteByQuery(query).getN();
@@ -83,21 +83,21 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
                     .set("courseRefs", s.getCourseRefs())
                     .set("user", s.getUser());
 
-            Query<Student> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(new ObjectId(s.getId()));
+            Query<Student> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(s.getId());
             this.update(updateQuery, ops);
         }
     }
 
     @Override
     public List<Student> fetchById(List<String> studentIdsList) {
-        List<ObjectId> objectIds = new ArrayList<>();
+        List<String> objectIds = new ArrayList<>();
         Query<Student> query =  null;
 
         if (studentIdsList != null) {
             for (String id : studentIdsList) {
                 if (id != null) {
                     //id = CommonUtils.sanitizeIdString(id);
-                    objectIds.add(new ObjectId(id));
+                    objectIds.add(id);
                 }
             }
         }

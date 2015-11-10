@@ -12,19 +12,16 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.esp.dao;
+package edu.sjsu.cohort6.esp.service.rest.exception;
 
-import java.util.List;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 /**
- * Generic DAO interface for basic CRUD operations on entity T.
- *
- * @author rwatsh on 9/24/15.
+ * @author rwatsh on 10/23/15.
  */
-public interface BaseDAO<T> {
-    List<String> add(List<T> entityList) throws DBException;
-    long remove(List<String> entityIdsList) throws DBException;
-    void update(List<T> entityList) throws DBException;
-    List<T> fetchById(List<String> entityIdsList) throws DBException;
-    List<T> fetch(String jsonQueryString) throws DBException;
+public class AuthorizationException extends WebApplicationException {
+    public AuthorizationException(String s) {
+        super(s, Response.Status.FORBIDDEN);
+    }
 }

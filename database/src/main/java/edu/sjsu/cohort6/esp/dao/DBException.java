@@ -14,17 +14,19 @@
 
 package edu.sjsu.cohort6.esp.dao;
 
-import java.util.List;
-
 /**
- * Generic DAO interface for basic CRUD operations on entity T.
+ * Database exception class.
  *
- * @author rwatsh on 9/24/15.
+ * @author rwatsh on 10/21/15.
  */
-public interface BaseDAO<T> {
-    List<String> add(List<T> entityList) throws DBException;
-    long remove(List<String> entityIdsList) throws DBException;
-    void update(List<T> entityList) throws DBException;
-    List<T> fetchById(List<String> entityIdsList) throws DBException;
-    List<T> fetch(String jsonQueryString) throws DBException;
+public class DBException extends Exception {
+
+
+    public DBException(String message, Throwable t) {
+        super(message, t);
+    }
+
+    public DBException(Throwable t) {
+        super(t);
+    }
 }

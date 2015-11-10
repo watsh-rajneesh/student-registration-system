@@ -15,11 +15,14 @@
 package edu.sjsu.cohort6.esp.service.rest;
 
 import edu.sjsu.cohort6.esp.common.BaseModel;
+import edu.sjsu.cohort6.esp.common.RoleType;
+import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
 import edu.sjsu.cohort6.esp.dao.mongodb.CourseDAO;
 import edu.sjsu.cohort6.esp.dao.mongodb.StudentDAO;
 import edu.sjsu.cohort6.esp.dao.mongodb.UserDAO;
 import edu.sjsu.cohort6.esp.service.rest.exception.InternalErrorException;
+import io.dropwizard.auth.Auth;
 import io.dropwizard.servlets.assets.ResourceNotFoundException;
 
 import javax.validation.Valid;
@@ -28,6 +31,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,29 +67,31 @@ public abstract class BaseResource<T extends BaseModel> {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    abstract public Response create(/*@Auth User user,*/ @Valid String modelJson, @Context UriInfo info);
+    abstract public Response create(@Auth User user, @Valid String modelJson, @Context UriInfo info);
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    abstract public List<T> list(/*@Auth User user*/) throws InternalErrorException;
+    abstract public List<T> list(@Auth User user, @QueryParam("filter") String filter) throws InternalErrorException;
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    abstract public  T retrieve(/*@Auth User user,*/ @PathParam("id") String id)
+    abstract public  T retrieve(@Auth User user, @PathParam("id") String id)
             throws ResourceNotFoundException, InternalErrorException;
 
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    abstract public T update(/*@Auth User user,*/ @PathParam("id") String id,
-                        @Valid T entity) throws ResourceNotFoundException, InternalErrorException;
+    abstract public T update(@Auth User user, @PathParam("id") String id,
+                        @Valid String entity) throws ResourceNotFoundException, InternalErrorException, IOException;
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    abstract public Response delete(/*@Auth User user,*/ @PathParam("id") String id)
+    abstract public Response delete(@Auth User user, @PathParam("id") String id)
             throws ResourceNotFoundException, InternalErrorException;
 
     /**
@@ -113,5 +119,10 @@ public abstract class BaseResource<T extends BaseModel> {
         }
         return entitiesList;
     }
+
+    protected boolean isAdminUser(@Auth User user) {
+        return user.getRole().getRole().equals(RoleType.ADMIN);
+    }
+
 }
 

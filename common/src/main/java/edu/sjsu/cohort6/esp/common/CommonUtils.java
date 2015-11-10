@@ -53,11 +53,6 @@ public class CommonUtils {
                 TypeFactory.defaultInstance().constructCollectionType(List.class, clazz));
     }
 
-    private static String removeIdField(String str) {
-
-        return str.replaceAll("\\\"id\\\":null,", "");
-    }
-
     /**
      * Convert JSON string to object.
      *
@@ -73,11 +68,31 @@ public class CommonUtils {
         return mapper.readValue(jsonStr, clazz);
     }
 
+    /**
+     * This method was needed to parse entity attribute out of other "unwanted" properties that Jersey response was
+     * appending. With this approach any unsturctured JSON data can be parsed into a generic JSONObject type and
+     * only the desired field of a known name can be singled out of it. Once we single out the entity piece from the
+     * response we use Jackson again to parse entity to our known type (Student, Course or User).
+     *
+     * @param response      jersey response
+     * @param clazz         the known type
+     * @return
+     * @throws IOException
+     * @throws org.json.simple.parser.ParseException
+     */
     public static <T> T convertJsonToObject(Response response, Class<T> clazz) throws IOException, org.json.simple.parser.ParseException {
         String json = getJsonFromResponse(response);
         return convertJsonToObject(json, clazz);
     }
 
+    /**
+     * This method parses the generic jersey response to a generic JSONObject and singles out the "entity" piece
+     * from the generic response.
+     *
+     * @param response
+     * @return
+     * @throws org.json.simple.parser.ParseException
+     */
     private static String getJsonFromResponse(Response response) throws org.json.simple.parser.ParseException {
         String c = response.readEntity(String.class);
         log.info(c.toString());
@@ -100,11 +115,6 @@ public class CommonUtils {
         final ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(object);
     }
-
-    /*public static String sanitizeIdString(String id) {
-        id = id.replaceAll("[\\\"\\']", "");
-        return id;
-    }*/
 
     private static String generateMD5Hash(String plaintext) throws NoSuchAlgorithmException {
         MessageDigest m = MessageDigest.getInstance("MD5");

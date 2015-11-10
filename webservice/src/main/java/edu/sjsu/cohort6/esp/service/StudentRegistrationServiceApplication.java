@@ -14,13 +14,19 @@
 
 package edu.sjsu.cohort6.esp.service;
 
+import edu.sjsu.cohort6.esp.common.User;
 import edu.sjsu.cohort6.esp.dao.DBClient;
+import edu.sjsu.cohort6.esp.service.auth.SimpleAuthenticator;
 import edu.sjsu.cohort6.esp.service.cli.CreateUserCommand;
 import edu.sjsu.cohort6.esp.service.cli.ListUserCommand;
 import edu.sjsu.cohort6.esp.service.health.DBHealthCheck;
 import edu.sjsu.cohort6.esp.service.rest.*;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.auth.AuthFactory;
+import io.dropwizard.auth.Authenticator;
+import io.dropwizard.auth.basic.BasicAuthFactory;
+import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -60,10 +66,10 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
         /*
          * Setup basic authentication against DB table.
          */
-        //Authenticator<BasicCredentials, User> simpleAuthenticator = new SimpleAuthenticator(dbClient);
-        /*environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<User>(simpleAuthenticator,
+        Authenticator<BasicCredentials, User> simpleAuthenticator = new SimpleAuthenticator(dbClient);
+        environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<User>(simpleAuthenticator,
                 "studentreg", // realm name
-                User.class))); // backing DB object*/
+                User.class))); // backing DB object
 
         environment.healthChecks().register("database", new DBHealthCheck(dbClient));
 
@@ -85,6 +91,10 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
         environment.jersey().setUrlPattern(EndpointUtils.ENDPOINT_ROOT + "/*");
         environment.jersey().register(studentResource);
         environment.jersey().register(courseResource);
+        /*
+         * Not registering user resource on purpose as student resource should be used to add a student user.
+         * Admin user can only be added through the command line not exposed to users.
+         */
         environment.jersey().register(userResource);
     }
 }
