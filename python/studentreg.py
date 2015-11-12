@@ -261,6 +261,12 @@ def query_courses(hostPort, query):
     url = "%s://%s/api/v1.0/courses/?filter=%s" % (get_http_scheme(), hostPort, quote1)
     return get_request(url)
 
+def update_course(hostPort, id, payload):
+    if payload is None:
+        print("Please specify the json file with -f option")
+        sys.exit(1)
+    url = "%s://%s/api/v1.0/courses/%s" % (get_http_scheme(), hostPort, id)
+    return put_request(payload, url)
 
 def delete_course(hostPort, id):
     """
@@ -362,6 +368,8 @@ def main():
         list_course(hostPort, id=args.id)
     elif command == "query-courses":
         query_courses(hostPort, query=args.query)
+    elif command == "update-course":
+        update_course(hostPort, id=args.id, payload=payload)
     elif command == "delete-course":
         delete_course(hostPort, id=args.id)
     else:
