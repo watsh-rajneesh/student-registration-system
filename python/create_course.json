@@ -1,0 +1,17 @@
+{
+  "courseName": "Virtualization",
+  "instructors": [
+    "Thomas Hildebrand"
+  ],
+  "startTime": 1444498200000,
+  "endTime": 1447189200000,
+  "availabilityStatus": 1,
+  "maxCapacity": 20,
+  "price": 1000,
+  "location": "Santa Clara, CA",
+  "keywords": [
+    "OpenStack",
+    "Java",
+    "REST"
+  ]
+}

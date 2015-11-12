@@ -99,7 +99,7 @@ public class StudentResource extends BaseResource<Student> {
                         .build();
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error in adding student", e);
-            throw new BadRequestException();
+            throw new BadRequestException(e);
         }
     }
 

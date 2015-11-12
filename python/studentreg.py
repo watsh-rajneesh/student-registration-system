@@ -22,12 +22,13 @@ import pprint
 import datetime
 import requests
 from requests.auth import HTTPBasicAuth
+from urllib.parse import quote
 
 """
 Global Constants
 """
-PASSWORD = '6a00b426-1243-4d80-a059-a1973e3482fe'
-USER = 'watsh.rajneesh@sjsu.edu'
+PASSWORD = 'password'
+USER = 'admin@sjsu.edu'
 HTTPS = 'false'
 
 
@@ -92,7 +93,7 @@ def get_request(url, headers=None):
     return r
 
 
-def put_request(headers, payload, url):
+def put_request(payload, url, headers=None):
     """
     PUT request.
     :param headers:
@@ -143,31 +144,143 @@ def delete_request(url):
 
 ############################### REST Client functions ############################
 
+########### Student methods #############
 def list_students(hostPort):
+    """
+    List all students.
+
+    :param hostPort:
+    :return:
+    """
     url = "%s://%s/api/v1.0/students" % (get_http_scheme(), hostPort)
     return get_request(url)
 
 
 def list_student(hostPort, id):
+    """
+    List a student by id.
+
+    :param hostPort:
+    :param id:
+    :return:
+    """
     url = "%s://%s/api/v1.0/students/%s" % (get_http_scheme(), hostPort, id)
     return get_request(url)
 
+def update_student(hostPort, id, payload):
+    """
+    Update a student by id.
+    This method is also used to enroll/unenroll student to courses.
+
+    :param hostPort:
+    :param id:
+    :param payload:
+    :return:
+    """
+    if payload is None:
+        print("Please specify the json file with -f option")
+        sys.exit(1)
+    url = "%s://%s/api/v1.0/students/%s" % (get_http_scheme(), hostPort, id)
+    return put_request(payload, url)
+
 def create_student(hostPort, payload):
+    """
+    Create a new student.
+    Each student is unique by his/her emailId specified in the payload.
+
+    :param hostPort:
+    :param payload:
+    :return:
+    """
     if payload is None:
         print("Please specify the json file with -f option")
         sys.exit(1)
     url = "%s://%s/api/v1.0/students" % (get_http_scheme(), hostPort)
     return post_request(url, payload)
 
-################################ MAIN ############################################
+def delete_student(hostPort, id):
+    """
+    Delete a student by id.
+
+    :param hostPort:
+    :param id:
+    :return:
+    """
+    url = "%s://%s/api/v1.0/students/%s" % (get_http_scheme(), hostPort, id)
+    return delete_request(url)
 
 
-
+###### Course methods ##############
 def create_course(hostPort, payload):
-    pass
+    """
+    Creates a new course.
+    A course is unique by its courseName in the payload.
 
+    :param hostPort:
+    :param payload:
+    :return:
+    """
+    if payload is None:
+        print("Please specify the json file with -f option")
+        sys.exit(1)
+    url = "%s://%s/api/v1.0/courses" % (get_http_scheme(), hostPort)
+    return post_request(url, payload)
+
+def list_courses(hostPort):
+    """
+    List all courses.
+
+    :param hostPort:
+    :return:
+    """
+    url = "%s://%s/api/v1.0/courses" % (get_http_scheme(), hostPort)
+    return get_request(url)
+
+
+def list_course(hostPort, id):
+    """
+    List a single course by id.
+
+    :param hostPort:
+    :param id:
+    :return:
+    """
+    url = "%s://%s/api/v1.0/courses/%s" % (get_http_scheme(), hostPort, id)
+    return get_request(url)
+
+def query_courses(hostPort, query):
+    """
+    Query a course. The query string is based on the query syntax for mongodb.
+
+    :param hostPort:
+    :param query:
+    :return:
+    """
+    quote1 = quote(query, safe='')
+    print(quote1)
+    url = "%s://%s/api/v1.0/courses/?filter=%s" % (get_http_scheme(), hostPort, quote1)
+    return get_request(url)
+
+
+def delete_course(hostPort, id):
+    """
+    Delete a course by id.
+
+    :param hostPort:
+    :param id:
+    :return:
+    """
+    url = "%s://%s/api/v1.0/courses/%s" % (get_http_scheme(), hostPort, id)
+    return delete_request(url)
+
+################################ MAIN ############################################rsh
 
 def main():
+    """
+    Main method of the student registration system client program.
+
+    :return:
+    """
     parser = argparse.ArgumentParser(description=textwrap.dedent('''\
             !!!Student Registration System!!!
             ----------------------------------
@@ -181,7 +294,6 @@ def main():
                     1.3 create-student -f create_student.json
                     1.4 delete-student -i <student-id>
                     1.5 update-student -i <student-id> -f update_student.json
-                    1.6 query-students -q <json query string>
                 2. Course Commands:
                     1.1 list-courses
                     1.2 list-course -i <course-id>
@@ -238,8 +350,23 @@ def main():
         list_student(hostPort, id=args.id)
     elif command == "create-student":
         create_student(hostPort, payload)
+    elif command == "update-student":
+        update_student(hostPort, id=args.id, payload=payload)
+    elif command == "delete-student":
+        delete_student(hostPort, id=args.id)
     elif command == "create-course":
         create_course(hostPort, payload)
+    elif command == "list-courses":
+        list_courses(hostPort)
+    elif command == "list-course":
+        list_course(hostPort, id=args.id)
+    elif command == "query-courses":
+        query_courses(hostPort, query=args.query)
+    elif command == "delete-course":
+        delete_course(hostPort, id=args.id)
+    else:
+        print("Unsupported command [", command, "]. \nPlease refer to help (-h option) for the list of supported commands.")
+        sys.exit(1)
 
 
 if __name__ == '__main__':

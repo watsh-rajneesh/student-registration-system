@@ -78,7 +78,7 @@ public class CourseResource extends BaseResource<Course> {
             }
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error in adding course", e);
-            throw new BadRequestException();
+            throw new BadRequestException(e);
         }
 
     }

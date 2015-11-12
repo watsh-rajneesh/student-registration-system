@@ -67,7 +67,7 @@ public class UserResource extends BaseResource<User> {
             }
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error in adding user", e);
-            throw new BadRequestException();
+            throw new BadRequestException(e);
         }
     }
 

@@ -21,7 +21,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 public class BadRequestException  extends WebApplicationException {
-    public BadRequestException() {
-        super(Response.Status.BAD_REQUEST);
+    public BadRequestException(Throwable throwable) {
+        super(throwable, Response.Status.BAD_REQUEST);
     }
 }
