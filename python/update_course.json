@@ -1,0 +1,17 @@
+{
+  "courseName": "NewCourse2",
+  "instructors": [
+    "Nikita"
+  ],
+  "startTime": "10-01-2015 10:00",
+  "endTime": "10-21-2015 12:00",
+  "availabilityStatus": 0,
+  "maxCapacity": 20,
+  "price": 1000,
+  "location": "Santa Clara, CA",
+  "keywords": [
+    "OpenStack",
+    "Java",
+    "REST"
+  ]
+}
