@@ -20,7 +20,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
 import edu.sjsu.cohort6.esp.common.Student;
 import edu.sjsu.cohort6.esp.dao.BaseDAO;
-import org.bson.types.ObjectId;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.dao.BasicDAO;
@@ -54,7 +53,7 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
      * @return
      */
     @Override
-    public List<String> add(List<Student> entityList) {
+    public synchronized List<String> add(List<Student> entityList) {
         List<String> insertedIds = new ArrayList<>();
 
         if (entityList != null) {
@@ -67,7 +66,7 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
     }
 
     @Override
-    public long remove(List<String> entityIdsList) {
+    public synchronized long remove(List<String> entityIdsList) {
         List<String> objectIds = new ArrayList<>();
         for (String id : entityIdsList) {
             objectIds.add(id);
@@ -77,7 +76,7 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
     }
 
     @Override
-    public void update(List<Student> studentList) {
+    public synchronized void update(List<Student> studentList) {
         for (Student s : studentList) {
             UpdateOperations<Student> ops = this.createUpdateOperations()
                     .set("courseRefs", s.getCourseRefs())
@@ -89,7 +88,7 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
     }
 
     @Override
-    public List<Student> fetchById(List<String> studentIdsList) {
+    public synchronized List<Student> fetchById(List<String> studentIdsList) {
         List<String> objectIds = new ArrayList<>();
         Query<Student> query =  null;
 
@@ -109,7 +108,7 @@ public class StudentDAO extends BasicDAO<Student, String> implements BaseDAO<Stu
     }
 
     @Override
-    public List<Student> fetch(String query) {
+    public synchronized List<Student> fetch(String query) {
         List<Student> students = new ArrayList<>();
         DBObject dbObjQuery;
         DBCursor cursor;

@@ -30,7 +30,7 @@ Global Constants
 PASSWORD = 'password'
 USER = 'admin@sjsu.edu'
 HTTPS = 'false'
-
+CACHE = {}
 
 def replace_value_with_definition(current_dict, key_to_find, definition):
     """
@@ -56,6 +56,12 @@ def get_http_scheme():
         return "https"
     else:
         return "http"
+
+def build_cache(data=None):
+    global CACHE
+    if data is not None:
+        CACHE.append(data)
+    print ("Caching data...")
 
 
 def pretty_print_json(response):
@@ -86,9 +92,9 @@ def get_request(url, headers=None):
     print('GET ' + str(url))
     if headers is not None:
         print('Request Headers:' + str(headers))
-        r = requests.get(url, auth=HTTPBasicAuth(USER, PASSWORD), headers=headers)
+        r = requests.get(url, auth=HTTPBasicAuth(USER, PASSWORD), headers=headers, verify=False)
     else:
-        r = requests.get(url, auth=HTTPBasicAuth(USER, PASSWORD))
+        r = requests.get(url, auth=HTTPBasicAuth(USER, PASSWORD), verify=False)
         pretty_print_json(r)
     return r
 
@@ -105,7 +111,7 @@ def put_request(payload, url, headers=None):
     print('RequestHeaders:' + str(headers))
     pp = pprint.PrettyPrinter(indent=2)
     pp.pprint(payload)
-    r = requests.put(url, auth=HTTPBasicAuth(USER, PASSWORD), data=json.dumps(payload), headers=headers)
+    r = requests.put(url, auth=HTTPBasicAuth(USER, PASSWORD), data=json.dumps(payload), headers=headers, verify=False)
     pretty_print_json(r)
     return r
 
@@ -120,12 +126,12 @@ def post_request(url, payload=None, headers=None):
     """
     print('POST ' + str(url))
     if payload is None and headers is None:
-        r = requests.post(url, auth=HTTPBasicAuth(USER, PASSWORD))
+        r = requests.post(url, auth=HTTPBasicAuth(USER, PASSWORD), verify=False)
     else:
         print('RequestHeaders:' + str(headers))
     pp = pprint.PrettyPrinter(indent=2)
     pp.pprint(payload)
-    r = requests.post(url, auth=HTTPBasicAuth(USER, PASSWORD), data=json.dumps(payload), headers=headers)
+    r = requests.post(url, auth=HTTPBasicAuth(USER, PASSWORD), data=json.dumps(payload), headers=headers, verify=False)
     pretty_print_json(r)
     return r
 
@@ -137,7 +143,7 @@ def delete_request(url):
     :return:
     """
     print('DELETE ' + str(url))
-    r = requests.delete(url, auth=HTTPBasicAuth(USER, PASSWORD))
+    r = requests.delete(url, auth=HTTPBasicAuth(USER, PASSWORD), verify=False)
     pretty_print_json(r)
     return r
 
@@ -152,6 +158,8 @@ def list_students(hostPort):
     :param hostPort:
     :return:
     """
+
+    build_cache()
     url = "%s://%s/api/v1.0/students" % (get_http_scheme(), hostPort)
     return get_request(url)
 
@@ -164,6 +172,7 @@ def list_student(hostPort, id):
     :param id:
     :return:
     """
+    build_cache()
     url = "%s://%s/api/v1.0/students/%s" % (get_http_scheme(), hostPort, id)
     return get_request(url)
 
@@ -233,6 +242,7 @@ def list_courses(hostPort):
     :param hostPort:
     :return:
     """
+    build_cache()
     url = "%s://%s/api/v1.0/courses" % (get_http_scheme(), hostPort)
     return get_request(url)
 
@@ -245,6 +255,7 @@ def list_course(hostPort, id):
     :param id:
     :return:
     """
+    build_cache()
     url = "%s://%s/api/v1.0/courses/%s" % (get_http_scheme(), hostPort, id)
     return get_request(url)
 

@@ -30,6 +30,7 @@
     <modules>
         <module>common</module>
         <module>database</module>
+        <module>database-tests</module>
         <module>webservice</module>
     </modules>
     <build>

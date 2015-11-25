@@ -30,6 +30,9 @@ import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
+import javax.servlet.DispatcherType;
+import java.util.EnumSet;
+
 /**
  * Created by rwatsh on 9/14/15.
  */
@@ -88,6 +91,8 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
         /*
          * Setup jersey environment.
          */
+        environment.servlets().addFilter("CacheControlFilter", new CacheControlFilter())
+                .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");;
         environment.jersey().setUrlPattern(EndpointUtils.ENDPOINT_ROOT + "/*");
         environment.jersey().register(studentResource);
         environment.jersey().register(courseResource);

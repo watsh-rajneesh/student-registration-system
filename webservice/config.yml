@@ -11,12 +11,29 @@ database:
 #    port: 8080
 
 server:
-  type: simple
-  applicationContextPath: /
+  adminMinThreads: 1
+  adminMaxThreads: 64
   adminContextPath: /admin
-  connector:
-    type: http
-    port: 8080
+  applicationContextPath: /
+  applicationConnectors:
+    - type: http
+      port: 8080
+    - type: https
+      port: 8443
+      keyStorePath: ./keystore.jks
+      keyStorePassword: password
+      trustStorePath: /Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/security/cacerts
+      trustStorePassword: changeit
+      certAlias: selfsigned
+  adminConnectors:
+    - type: http
+      port: 8081
+    - type: https
+      port: 8444
+      keyStorePath: ./keystore.jks
+      keyStorePassword: password
+      keyStoreType: JKS
+      validateCerts: false
 
 logging:
   level: INFO

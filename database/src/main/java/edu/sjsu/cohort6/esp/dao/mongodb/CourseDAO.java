@@ -47,7 +47,7 @@ public class CourseDAO extends BasicDAO<Course, String> implements BaseDAO<Cours
     }
 
     @Override
-    public List<String> add(List<Course> entityList) throws DBException {
+    public synchronized List<String> add(List<Course> entityList) throws DBException {
         try {
             //morphiaDatastore.save(courseList);
             List<String> insertedIds = new ArrayList<>();
@@ -64,7 +64,7 @@ public class CourseDAO extends BasicDAO<Course, String> implements BaseDAO<Cours
     }
 
     @Override
-    public long remove(List<String> courseIdsList) {
+    public synchronized long remove(List<String> courseIdsList) {
         List<String> objectIds = new ArrayList<>();
         for (String id : courseIdsList) {
             objectIds.add(id);
@@ -74,7 +74,7 @@ public class CourseDAO extends BasicDAO<Course, String> implements BaseDAO<Cours
     }
 
     @Override
-    public void update(List<Course> courseList) {
+    public synchronized void update(List<Course> courseList) {
         for (Course course : courseList) {
             UpdateOperations<Course> ops = this.createUpdateOperations()
                     .set("courseName", course.getCourseName())
@@ -95,7 +95,7 @@ public class CourseDAO extends BasicDAO<Course, String> implements BaseDAO<Cours
     }
 
     @Override
-    public List<Course> fetchById(List<String> courseIdsList) {
+    public synchronized List<Course> fetchById(List<String> courseIdsList) {
         List<String> objectIds = new ArrayList<>();
         if (courseIdsList != null) {
             for (String id : courseIdsList) {
@@ -115,7 +115,7 @@ public class CourseDAO extends BasicDAO<Course, String> implements BaseDAO<Cours
     }
 
     @Override
-    public List<Course> fetch(String query) {
+    public synchronized List<Course> fetch(String query) {
         List<Course> courses = new ArrayList<>();
         DBObject dbObjQuery;
         DBCursor cursor;
@@ -135,7 +135,7 @@ public class CourseDAO extends BasicDAO<Course, String> implements BaseDAO<Cours
 
     }
 
-    public Course fetchCourseByName(String name) {
+    public synchronized Course fetchCourseByName(String name) {
         List<Course> courses =  this.fetch("{courseName: \"" + name + "\"}");
         if (!courses.isEmpty()) {
             return courses.get(0);
