@@ -66,8 +66,8 @@ public class StudentResource extends BaseResource<Student> {
     @HEAD
     public Response login(@Auth User user, @Context UriInfo info) {
         Cookie sessionCookie = new Cookie("userName", user.getUserName());
-
         NewCookie cookies = new NewCookie(sessionCookie);
+
         return Response.ok().cookie(cookies).build();
     }
 
@@ -133,15 +133,30 @@ public class StudentResource extends BaseResource<Student> {
         /**
          * This method can only be run by an ADMIN.
          */
-        /*if (isAdminUser(user)) {*/
-            List<String> studentIds = new ArrayList<>();
-            List<Student> studentList = studentDAO.fetchById(studentIds);
-            return studentList;
-        /*} else {
-            throw new AuthorizationException("User " + user.getUserName() + " is not allowed to perform this operation");
-        }*/
-    }
+        List<String> studentIds = new ArrayList<>();
+        List<Student> studentList = studentDAO.fetchById(studentIds);
+        
+        if (isAdminUser(user)) {
 
+
+            return studentList;
+        } else {
+		    int myIndex = 0;
+		   
+		    for( int i = 0; i < studentList.size(); i++ ){
+				if(studentList.get(i).getUser().getId().equals(user.getId()))
+				{
+					myIndex = i;		
+					break;
+				}
+		    }
+		    
+	        List<Student> returnList = new ArrayList<>();
+	        returnList.add(studentList.get(myIndex));
+	        return returnList;
+        }
+    }
+    
     @Override
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -155,7 +170,7 @@ public class StudentResource extends BaseResource<Student> {
             throw new ResourceNotFoundException();
         }
     }
-
+    
     @Override
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
@@ -302,4 +317,5 @@ public class StudentResource extends BaseResource<Student> {
             throw new ResourceNotFoundException();
         }
     }
+
 }
