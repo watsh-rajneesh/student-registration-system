@@ -30,7 +30,6 @@ Global Constants
 PASSWORD = 'password'
 USER = 'admin@sjsu.edu'
 HTTPS = 'false'
-CACHE = {}
 
 def replace_value_with_definition(current_dict, key_to_find, definition):
     """
@@ -56,12 +55,6 @@ def get_http_scheme():
         return "https"
     else:
         return "http"
-
-def build_cache(data=None):
-    global CACHE
-    if data is not None:
-        CACHE.append(data)
-    print ("Caching data...")
 
 
 def pretty_print_json(response):
@@ -159,7 +152,6 @@ def list_students(hostPort):
     :return:
     """
 
-    build_cache()
     url = "%s://%s/api/v1.0/students" % (get_http_scheme(), hostPort)
     return get_request(url)
 
@@ -172,7 +164,6 @@ def list_student(hostPort, id):
     :param id:
     :return:
     """
-    build_cache()
     url = "%s://%s/api/v1.0/students/%s" % (get_http_scheme(), hostPort, id)
     return get_request(url)
 
@@ -242,7 +233,6 @@ def list_courses(hostPort):
     :param hostPort:
     :return:
     """
-    build_cache()
     url = "%s://%s/api/v1.0/courses" % (get_http_scheme(), hostPort)
     return get_request(url)
 
@@ -255,7 +245,6 @@ def list_course(hostPort, id):
     :param id:
     :return:
     """
-    build_cache()
     url = "%s://%s/api/v1.0/courses/%s" % (get_http_scheme(), hostPort, id)
     return get_request(url)
 
@@ -337,8 +326,8 @@ def main():
     parser.add_argument('-H', '--https', help='Use https, default=false', default='false')
 
     creds_group = parser.add_argument_group("Credentials Group")
-    creds_group.add_argument('-u', '--user', help='user', default='admin')
-    creds_group.add_argument('-p', '--password', help='password', default='admin')
+    creds_group.add_argument('-u', '--user', help='user', default='admin@sjsu.edu')
+    creds_group.add_argument('-p', '--password', help='password', default='password')
 
     args = parser.parse_args()
 

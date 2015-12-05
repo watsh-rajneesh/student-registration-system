@@ -92,7 +92,7 @@ public class StudentRegistrationServiceApplication extends Application<StudentRe
          * Setup jersey environment.
          */
         environment.servlets().addFilter("CacheControlFilter", new CacheControlFilter())
-                .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");;
+                .addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
         environment.jersey().setUrlPattern(EndpointUtils.ENDPOINT_ROOT + "/*");
         environment.jersey().register(studentResource);
         environment.jersey().register(courseResource);

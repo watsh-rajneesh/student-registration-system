@@ -1,5 +1,5 @@
 {
-  "courseName": "NewCourse2",
+  "courseName": "Virtualization",
   "instructors": [
     "Nikita"
   ],
@@ -7,10 +7,9 @@
   "endTime": "10-21-2015 12:00",
   "availabilityStatus": 0,
   "maxCapacity": 20,
-  "price": 1000,
+  "price": 2000,
   "location": "Santa Clara, CA",
   "keywords": [
-    "OpenStack",
     "Java",
     "REST"
   ]
