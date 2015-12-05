@@ -1,0 +1,35 @@
+<div class="jumbotron" ng-app="myApp">
+  <div class="row">
+    <div class="container">
+      <div class="col-md-4">
+              <h3>Profile:</h3>
+              <b>Student Name: </b>{{userProfile[0].user.firstName}} {{userProfile[0].user.lastName}}<br>
+              <b>Username: </b>{{userProfile[0].user.userName}}<br>
+              <b>User Email: </b>{{userProfile[0].user.emailId}}<br>
+      </div>
+      <div class="col-md-4">
+          <ul class="nav nav-tabs">
+          <li ng-class="{active: $route.current.activetab == 'courses'}"><a href="" ng-click="loadClasses()"><h4>Available Courses</h4></a></li>
+          <li ng-class="{active: $route.current.activetab == 'yourCourses'}"><a href="" ng-Click="loadEnrolledClasses()"><h4>Your Courses</h4></a></li>
+          </ul>
+          <div class="tab-content">
+            <div id="courseList" ng-show="showme">
+              <select name="classSelect" id="classSelect" style="width: 100%;" multiple="10" ng-model="data.classSelect">
+              <option ng-repeat="classes in classes">{{classes.courseName}}</option>
+              </select>
+            </div>
+            <div id="yourCourses" ng-hide="showme">
+              <select name="enrollment" id="enrollment" style="width: 100%;" multiple="10" ng-model="data.classSelect">
+              <option ng-repeat="classes in enrolledClasses">{{classes.courseName}}</option>
+              </select>
+            </div>
+          </div>
+          <tr align="center">
+          <td><input type="submit" ng-click="enroll()" ng-show="showme" value="Enroll"></td>
+          <td><input type="submit" ng-click="unenroll()" ng-hide="showme" value="Unenroll"></td>
+          <p ng-bind="enStatus"></p>
+          </tr>
+        </div>
+      </div>
+  </div>
+</div>  
